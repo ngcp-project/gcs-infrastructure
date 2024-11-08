@@ -8,7 +8,7 @@ def data_receive_callback(xbee_message):
 
 def main():
     xbee = XBeeDevice(PORT, BAUD_RATE)
-    remote = RemoteXBeeDevice(xbee, XBee64BitAddress.from_hex_string("0013A200424366C7")) # Replace with remote device's 64-bit address (MAC address)
+    remote = RemoteXBeeDevice(xbee, XBee64BitAddress.from_hex_string("0013A20042435A3D")) # Replace with remote device's 64-bit address (MAC address)
 
     try:
         xbee.open()
@@ -28,14 +28,18 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
 
-    while xbee is not None and xbee.is_open():
-        data_to_send = input()
-        print("Sending broadcast data: %s..." % data_to_send)
+    try:
+        while xbee is not None and xbee.is_open():
+            data_to_send = input()
+            print("Sending broadcast data: %s..." % data_to_send)
 
-        # xbee.send_data_broadcast(data_to_send)
-        xbee.send_data_async(remote, data_to_send)
-        print("Data sent")
+            # xbee.send_data_broadcast(data_to_send)
+            xbee.send_data_async(remote, data_to_send)
+            print("Data sent")
     
+    except Exception as e:
+        print(f"Error: {e}")
+
     # finally:
     #     if xbee is not None and xbee.is_open():
     #         xbee.close()
