@@ -27,18 +27,19 @@ def main():
         # print("Waiting for data...\n")
     except Exception as e:
         print(f"Error: {e}")
+        
+    while xbee is not None and xbee.is_open():
+        try:
+                data_to_send = input()
+                print("Sending broadcast data: %s..." % data_to_send)
 
-    try:
-        while xbee is not None and xbee.is_open():
-            data_to_send = input()
-            print("Sending broadcast data: %s..." % data_to_send)
-
-            # xbee.send_data_broadcast(data_to_send)
-            xbee.send_data_async(remote, data_to_send)
-            print("Data sent")
-    
-    except Exception as e:
-        print(f"Error: {e}")
+                # xbee.send_data_broadcast(data_to_send)
+                # xbee.send_data_async(remote, data_to_send)
+                xbee.send_data(remote, data_to_send)
+                print("Data sent")
+        
+        except Exception as e:
+            print(f"Error: {e}")
 
     # finally:
     #     if xbee is not None and xbee.is_open():
