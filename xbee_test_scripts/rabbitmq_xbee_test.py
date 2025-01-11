@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, '../')
+
 import serial
 import threading
 import time
@@ -43,7 +46,7 @@ def transmit_data(ser, message):
 
     ser.write(frame)
 
-    global transmit
+    # global transmit
     with transmit_lock:
         transmit = False
     # time.sleep(0.1);

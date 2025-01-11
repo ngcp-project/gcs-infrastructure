@@ -25,7 +25,7 @@ class XBee:
         self.ser = None
 
     # Transmit data
-    def transmit_data(self, data, address = 00000000):
+    def transmit_data(self, data, address = "00000000"):
         self.ser.write(self.encode_data(data, address))
 
     # Receive data
@@ -37,20 +37,24 @@ class XBee:
         return data
     
     # Encode data
+    # NOTE** Might need to check data length
     def encode_data(self, data, address = "00000000"):
         frame = bytearray()
         frame.append(0x7E)  # Start delimiter (1 byte)
         frame.append(((len(data) + 11) // 256))  # Length (2 bytes)
         frame.append((len(data) + 11) % 256)
         frame.append(0x00)  # Frame type (1 byte)
-        frame.append(0x01)  # 64-bit address (8 bytes)
-        frame.append(address.encode('utf-8'))  # Address (8 bytes)
-        # for i in range(8):
-        #     frame.append(address[i])
+        frame.append(0x01)  # Frame ID (1 bytes)
+
+        for i in range(8):  # 64-bit address (8 bytes)
+            frame.append(int(address[i], 16))
+
         frame.append(0x00)  # Options (1 byte)
         frame.extend(data.encode('utf-8'))  # RF data (0 - 256 bytes)
         checksum = 0xFF - (sum(frame[3:]) & 0xFF)
         frame.append(checksum)  # Checksum (1 byte)
+
+        print(frame)
 
         return frame
     
