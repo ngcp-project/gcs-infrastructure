@@ -4,13 +4,24 @@ import serial
 class XBee:
     # Initialize serial connection
     def __init__(self, port, baudrate):
+        """Initialize serial connection
+
+        Args:
+          port: Port of serial device.
+          baudrate: Baudrate of serial device.
+        """
         self.port = port
         self.baudrate = baudrate
         self.ser = None
         self.__transmitting = False
     
-    # Open serial connection
+
     def open(self):
+        """Opens serial port.
+
+        Returns:
+          True if success, False if failure.
+        """
         try:
             self.ser = serial.Serial(self.port, self.baudrate, timeout=0)
         except serial.SerialException:
@@ -19,26 +30,60 @@ class XBee:
         
         return True
     
-    # Close serial connection
+
     def close(self):
-        self.ser.close()
-        self.ser = None
+        """Close serial port.
 
-    # Transmit data
+        Returns:
+          True if success, False if failure (Error or port already closed).
+        """
+        if self.ser is not None:
+            self.ser.close()
+            self.ser = None
+            return True
+        return False
+
+
     def transmit_data(self, data, address = "00000000"):
-        self.ser.write(self.encode_data(data, address))
+        """Transmit data.
 
-    # Receive data
+        Args:
+          data: String data to transmit.
+          address: Address of destination XBee module. "00000000" if no value is provided.
+
+        Returns:
+          True if success, False if failure.
+        """
+        if self.ser is not None:
+            self.ser.write(self.__encode_data(data, address))
+            return True
+        return False
+
+
     def receive_data(self):
+        """Read incomming data.
+
+        Returns:
+          Incomming String data, None if no data.
+        """
         data = self.ser.readline()
         if data == None:
             return None
-        data = self.decode_data(data)
+        data = self.__decode_data(data)
         return data
     
-    # Encode data
+
     # NOTE** Might need to check data length
-    def encode_data(self, data, address = "00000000"):
+    def __encode_data(self, data, address = "00000000"):
+        """Encode String data.
+
+        Args: 
+          data: String data to encode.
+          address: Address of destination XBee module. "00000000" if no value is provided.
+
+        Returns:
+          Framed String data.
+        """
         frame = bytearray()
         frame.append(0x7E)  # Start delimiter (1 byte)
         frame.append(((len(data) + 11) // 256))  # Length (2 bytes)
@@ -58,20 +103,28 @@ class XBee:
 
         return frame
     
-    # Decode data
-    def decode_data(self, data): # NOTE** Might need to retrieve sender address
+
+    def __decode_data(self, data): # NOTE** Might need to retrieve sender address
+        """Decode String data.
+
+        Args: 
+          data: String data to decode.
+
+        Returns:
+          Deframed String data.
+        """
         message = data[15:-1].decode('utf-8')
         return message
 
-    # Read next incoming data (Include timeout?)
-    def read_next(self):
-        try:
-            while True:
-                data = self.receive_data()
-                if data:
-                    # print(f"Received data: {data}")
-                    return data
+    # # Read next incoming data (Include timeout?)
+    # def read_next(self):
+    #     try:
+    #         while True:
+    #             data = self.receive_data()
+    #             if data:
+    #                 # print(f"Received data: {data}")
+    #                 return data
 
-        except serial.SerialException as e:
-            print(f"Error: {e}")
-            return False
+    #     except serial.SerialException as e:
+    #         print(f"Error: {e}")
+    #         return False
