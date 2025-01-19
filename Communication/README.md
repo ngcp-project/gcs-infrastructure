@@ -1,10 +1,15 @@
-## XBee Frame (API Mode - Frame Type 00)
+# XBee Frame Information
+
+## XBee Frame Transmit: 64-bit Address(API Mode - Frame Type 00)
 
 ### Start delimiter (1 byte)
 Always set to **7E** in XBee API Mode
 
 ### Length (2 bytes)
 Number of bytes between Length and Checksum fields
+
+> [!Note]
+> The maximum length should be `00 6F` or `111` bytes ([See RF data](#rf-data-0---256-bytes))
 
 ### Frame type (1 byte)
 Specefies XBee API frame type 
@@ -24,6 +29,50 @@ Use `00 00 00 00 00 00 FF FF` to send a broadcast packet.
 ### RF data (0 - 256 bytes)
 Packet payload, up to **256** bytes (256 characters)
 
+> [!Important]
+> Although it is stated that the packet payload can be 0 - 256 bytes, the packet payload can only be up to **100** bytes (100 characters)
+>
+![Xbee Maximum Packet Payload Length](./images/XBee%20Maximum%20Packet%20Payload%20Length.png)
+
 ### Checksum (1 byte)
 FF minus 8-bit sum of bytes between length and checksum fields.
 
+## XBee Frame Receive: 16-bit Address(API Mode - Frame Type 81)
+
+### Start delimiter (1 byte)
+Always set to **7E** in XBee API Mode
+
+### Length (2 bytes)
+Number of bytes between Length and Checksum fields
+
+> [!Note]
+> The maximum length should be `00 69` or `105` bytes
+
+### Frame type (1 byte)
+Specefies XBee API frame type 
+
+## 16-bit source address (2 bytes)
+16-bit network address of the sender device.
+Can be set in XTCU (Parameter **MM**).
+
+> [!Note]
+> Set to `FF FE` if the sender's 16-bit address is unknown
+
+## Received Signal Strength Indicator (RSSI) (1 byte)
+Hexadecimal equivalent of (-dBm) value.
+
+Example:
+* For a RX signal strength of -40 dBm, a 28 hexadecimal value (40 decimal) is returned.
+
+## Options (1 byte)
+Bitfield indicating the Rx indicator options
+* bit 0 - [reserved]
+* bit 1 - Address broadcast
+* bit 2 - PAN broadcast
+* bits 3-7 0 [reserved]
+
+## RF data (0 - 100 bytes)
+Packet payload, up to **100** bytes (100 characters)
+
+# Checksum (1 byte)
+FF minus 8-bit sum of bytes between length and checksum fields.
