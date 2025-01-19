@@ -51,28 +51,28 @@ Number of bytes between Length and Checksum fields
 ### Frame type (1 byte)
 Specefies XBee API frame type 
 
-## 16-bit source address (2 bytes)
+### 16-bit source address (2 bytes)
 16-bit network address of the sender device.
 Can be set in XTCU (Parameter **MM**).
 
 > [!Note]
 > Set to `FF FE` if the sender's 16-bit address is unknown
 
-## Received Signal Strength Indicator (RSSI) (1 byte)
+### Received Signal Strength Indicator (RSSI) (1 byte)
 Hexadecimal equivalent of (-dBm) value.
 
 Example:
 * For a RX signal strength of -40 dBm, a 28 hexadecimal value (40 decimal) is returned.
 
-## Options (1 byte)
+### Options (1 byte)
 Bitfield indicating the Rx indicator options
 * bit 0 - [reserved]
 * bit 1 - Address broadcast
 * bit 2 - PAN broadcast
 * bits 3-7 0 [reserved]
 
-## RF data (0 - 100 bytes)
+### RF data (0 - 100 bytes)
 Packet payload, up to **100** bytes (100 characters)
 
-# Checksum (1 byte)
+### Checksum (1 byte)
 FF minus 8-bit sum of bytes between length and checksum fields.
