@@ -1,3 +1,5 @@
+# Can be used to implement the serial port manager for other radio modules
+
 class Serial:
     def open(self) -> bool:
         """Opens serial port.

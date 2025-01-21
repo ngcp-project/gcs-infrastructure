@@ -22,7 +22,7 @@ def main():
         try:
             data = xbee.retrieve_data()
             if data:
-                print(data)
+                print("Retrieved data:", data)
         except Exception as e:
             print(f"Error: {e}")
         except KeyboardInterrupt:

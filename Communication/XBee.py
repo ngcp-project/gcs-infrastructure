@@ -57,7 +57,9 @@ class XBee(Serial):
           True if success, False if failure.
         """
         if self.ser is not None:
+            self.__transmitting = True
             self.ser.write(self.__encode_data(data, address))
+            self.__transmitting = False
             return True
         return False
 
@@ -83,23 +85,26 @@ class XBee(Serial):
             # # It might be possible for nothing to be read, leading to an incorrect length
             l1 = self.ser.read(1)
             l2 = self.ser.read(1)
-            print("Length bytes:",'{:02x} '.format(l1[0]), '{:02x} '.format(l2[0]))
+            print("Length bytes:",'{:02x} '.format(l1[0]),'{:02x} '.format(l2[0]))
             length = l1[0] * 256 + l2[0]
             print("Length:", length)
             data = b''
             while len(data) < length:
                 chunk = self.ser.read(length - len(data))
                 data += chunk
-            print("Data:")
-            for b in data:
-                print('{:02x} '.format(b))
-                # print("Data:", data)
+            print("Data Between Length & Checksum Fields:")
+            # for b in data:
+            #     print('{:02x} '.format(b))
+            #     # print("Data:", data)
+            print(''.join('{:02x} '.format(x) for x in data))
             while True:
                 expected_checksum = self.ser.read(1)
                 if expected_checksum:
                     print("Received Checksum:", '{:02x} '.format(expected_checksum[0]))
                     calculated_checksum = 0xFF - (sum(data) & 0xFF)
                     print("Calculated Checksum:", '%0.2x' % calculated_checksum)
+                    if expected_checksum[0] == calculated_checksum:
+                        return data[5:].decode()
                     break
             # return self.__decode_data()
         elif byte:
