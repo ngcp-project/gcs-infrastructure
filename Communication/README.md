@@ -1,3 +1,84 @@
+# XBee Serial Library
+
+## Quickstart
+
+* TO DO
+
+### Finding the serial port (device name)
+#### Mac
+1. Plug in XBee RF module
+2. Run `ls -l /dev/cu.usb`
+3. The device name should look similar to this:
+
+`/dev/cu.usbserial-D30DWZKT`
+
+#### Linux
+
+...
+
+#### Windows
+
+...
+
+## Constructor
+
+`__init__(port, baudrate)`
+
+Initializes serial port
+
+**Parameters**
+
+* *port* (str or None) - Port of serial device.
+* *baudrate* (int) - Baudrate of serial device.
+
+**Example**
+
+```py
+from Communication.XBee import XBee
+
+PORT = "/dev/cu.usbserial-D30DWZKT"
+BAUD_RATE = 115200
+xbee = XBee(PORT, BAUD_RATE)
+```
+
+## Methods
+
+`open()`
+
+Open an XBee connection over the serial port.
+
+**Returns:**
+* *True* if success, *False* if failure.
+
+**Throws:**
+* *SerialException* - if there is an error opening the serial port
+
+`close()`
+
+Close an XBee connection over the serial port.
+
+**Returns:**
+* *True* if success, *False* if failure.
+
+`transmit_data(string data, string address)`
+
+Send data to another XBee module(s)
+
+**Parameters:**
+
+* *data* (str) -  String data to transmit.
+* *address* (str) - Address of destination XBee module. "00000000" if no value is provided.
+
+**Returns:**
+* *True* if success, *False* if failure.
+
+`retrieve_data()`
+
+Check for incomming data
+
+**Returns:**
+* *String* if ther is incomming data. *None* otherwise.
+
 # XBee Frame Information
 
 ## XBee Frame Transmit: 64-bit Address(API Mode - Frame Type 00)

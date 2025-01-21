@@ -4,7 +4,7 @@ from Communication.interfaces.Serial import Serial
 
 class XBee(Serial):
     # Initialize serial connection
-    def __init__(self, port, baudrate):
+    def __init__(self, port, baudrate = 9600):
         """Initialize serial connection
 
         Args:
