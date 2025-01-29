@@ -46,12 +46,11 @@ class XBee(Serial):
         return False
 
 
-    def transmit_data(self, data, address = "00000000"):
+    def transmit_data(self, data, address = "0000000000000000"):
         """Transmit data.
-
         Args:
           data: String data to transmit.
-          address: Address of destination XBee module. "00000000" if no value is provided.
+          address: Address of destination XBee module. "0000000000000000" if no value is provided.
 
         Returns:
           True if success, False if failure.
@@ -120,13 +119,12 @@ class XBee(Serial):
     
 
     # NOTE** Might need to check data length
-    def __encode_data(self, data, address = "00000000"):
+    def __encode_data(self, data, address = "0000000000000000"):
         """Encode String data.
 
         Args: 
           data: String data to encode.
-          address: Address of destination XBee module. "00000000" if no value is provided.
-
+          address: Address of destination XBee module. "0000000000000000" if no value is provided.
         Returns:
           Framed String data.
         """
@@ -138,7 +136,7 @@ class XBee(Serial):
         frame.append(0x01)  # Frame ID (1 bytes)
 
         for i in range(8):  # 64-bit address (8 bytes)
-            frame.append(int(address[i], 16))
+            frame.append(int(address[2 * i : 2 * i + 2], 16))
 
         frame.append(0x00)  # Options (1 byte)
         frame.extend(data.encode('utf-8'))  # RF data (0 - 256 bytes)
