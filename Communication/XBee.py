@@ -4,16 +4,18 @@ from Communication.interfaces.Serial import Serial
 
 class XBee(Serial):
     # Initialize serial connection
-    def __init__(self, port, baudrate = 9600):
+    def __init__(self, port, baudrate = 9600, status = False):
         """Initialize serial connection
 
         Args:
           port: Port of serial device.
           baudrate: Baudrate of serial device.
+          status: Automatically receive status packets after a transmission.
         """
         self.port = port
         self.baudrate = baudrate
         self.ser = None
+        self.status = status
         self.__transmitting = False
         self.__receiving = False
     
@@ -46,7 +48,7 @@ class XBee(Serial):
         return False
 
 
-    def transmit_data(self, data, address = "0000000000000000"):
+    def transmit_data(self, data, address = "0000000000000000", retrieveStatus = False) -> bool:
         """Transmit data.
         Args:
           data: String data to transmit.
@@ -59,7 +61,15 @@ class XBee(Serial):
             self.__transmitting = True
             self.ser.write(self.__encode_data(data, address))
             self.__transmitting = False
-            return True
+
+            # If retrieve status is true
+            if(retrieveStatus):
+                self.__receiving = True
+                return self.__retrieve_status()
+            # Return true once data is send to the XBee module over serial.
+            # NOTE: This does not mean that a transmission is successful
+            else:
+                return True
         return False
 
 
@@ -103,6 +113,8 @@ class XBee(Serial):
                     calculated_checksum = 0xFF - (sum(data) & 0xFF)
                     print("Calculated Checksum:", '%0.2x' % calculated_checksum)
                     if expected_checksum[0] == calculated_checksum:
+                        # if data[4]:
+
                         return data[5:].decode()
                     break
             # return self.__decode_data()
@@ -116,7 +128,12 @@ class XBee(Serial):
             # print("Decoded data:" + data)
             # return data
         return None
-    
+
+    # NOTE** Retrieve status might read 
+    def __retrieve_status(self) -> bool:
+        
+        pass
+
 
     # NOTE** Might need to check data length
     def __encode_data(self, data, address = "0000000000000000"):

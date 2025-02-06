@@ -2,8 +2,10 @@ import sys
 sys.path.insert(1, '../')
 
 from Communication.XBee import XBee
+# from Logs.Logger import Logger
 
-PORT = "/dev/cu.usbserial-D30DWZKT"
+# PORT = "/dev/cu.usbserial-D30DWZKT"
+PORT = "/dev/cu.usbserial-D30DWZKY"
 BAUD_RATE = 115200
 
 def main():
@@ -12,19 +14,24 @@ def main():
 
     # Initialize XBee object
     xbee = XBee(PORT, BAUD_RATE)
+    # logger = Logger()
         # Open serial connection
     try:
-        xbee.open()
+        opened = xbee.open()
+        # logger.write(f"Opening XBee connection... {"Success" if opened else "Failed"}")
     except Exception as e:
         print(f"Error: {e}")
+        # logger.write(f"Error: {e}")
 
     while xbee is not None and xbee.ser is not None:
         try:
             data = xbee.retrieve_data()
             if data:
                 print("Retrieved data:", data)
+                # logger.write(f"Retrieved data:", data)
         except Exception as e:
             print(f"Error: {e}")
+            # logger.write(f"Error: {e}")
         except KeyboardInterrupt:
             return
         # finally:
@@ -32,6 +39,8 @@ def main():
         #     print("Closing serial connection...")
         #     xbee.close()
         #     return
+    xbee.close()
+    # logger.write("XBee connection closed")
         
 if __name__ == '__main__':
     main()
