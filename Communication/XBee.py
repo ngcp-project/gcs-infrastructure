@@ -74,66 +74,102 @@ class XBee(Serial):
 
 
     def retrieve_data(self):
-        """Read incomming data.
-
-        Returns:
-          Incomming String data (Deframed data), None if no data.
         """
-        # bytes = self.ser.readline()
+        Read incoming data in API mode:
+        - Start delimiter (0x7E)
+        - 2-byte Length
+        - Frame Data (length bytes)
+        - 1-byte Checksum
+        """
 
-        # if bytes:
-        #   print(''.join('{:02x} '.format(x) for x in bytes))
+        # 1) Read one byte
+        start_delim = self.ser.read(1)
+        if not start_delim:
+            # No data at all
+            return None
 
-        byte = self.ser.read(1)
+        # 2) Check if it's 0x7E
+        if start_delim[0] != 0x7E:
+            # Not the start delimiter -> leftover byte from a second frame?
+            print(f"Pass {start_delim[0]:02x}")
+            return None
 
-        # Read byte by byte until start delimiter (7E) is read
-        if byte and byte[0] == 0x7E:
-            # # print(hex(byte[0]))
-            # print('{:02x} '.format(byte[0]))
-            self.__receiving = True
-            # # It might be possible for nothing to be read, leading to an incorrect length
-            l1 = self.ser.read(1)
-            l2 = self.ser.read(1)
-            print("Length bytes:",'{:02x} '.format(l1[0]),'{:02x} '.format(l2[0]))
-            length = l1[0] * 256 + l2[0]
-            print("Length:", length)
-            data = b''
-            while len(data) < length:
-                chunk = self.ser.read(length - len(data))
-                data += chunk
-            print("Data Between Length & Checksum Fields:")
-            # for b in data:
-            #     print('{:02x} '.format(b))
-            #     # print("Data:", data)
-            print(''.join('{:02x} '.format(x) for x in data))
-            while True:
-                expected_checksum = self.ser.read(1)
-                if expected_checksum:
-                    print("Received Checksum:", '{:02x} '.format(expected_checksum[0]))
-                    calculated_checksum = 0xFF - (sum(data) & 0xFF)
-                    print("Calculated Checksum:", '%0.2x' % calculated_checksum)
-                    if expected_checksum[0] == calculated_checksum:
-                        # if data[4]:
+        # 3) Read the next 2 bytes for length
+        length_bytes = self.ser.read(2)
+        if len(length_bytes) < 2:
+            # Not enough data
+            return None
 
-                        return data[5:].decode()
-                    break
-            # return self.__decode_data()
-        elif byte:
-        #     print(data, data[0])
-        #     print(data[0] == 0x7E)
-        #     print("Incomming framed data:")
-            # print(byte)
-            print('Pass {:02x} '.format(byte[0]))
-        #     data = self.__decode_data(data)
-            # print("Decoded data:" + data)
-            # return data
-        return None
+        length = (length_bytes[0] << 8) + length_bytes[1]
+        print("\nLength bytes:", f"{length_bytes[0]:02x}", f"{length_bytes[1]:02x}")
+        print("Length:", length)
 
-    # NOTE** Retrieve status might read 
-    def __retrieve_status(self) -> bool:
+        # 4) Read 'length' bytes of frame data
+        frame_data = self.ser.read(length)
+        if len(frame_data) < length:
+            # Incomplete frame
+            return None
+
+        print("Data Between Length & Checksum Fields:")
+        print(" ".join(f"{b:02x}" for b in frame_data))
+
+        # 5) Read the 1-byte checksum
+        checksum_raw = self.ser.read(1)
+        print("DEBUG: checksum_raw =", checksum_raw)
+
+        if len(checksum_raw) < 1:
+            print("DEBUG: No checksum byte read!")
+            # Did not get the checksum byte
+            return None
+
+        expected_checksum = checksum_raw[0]
+
+        # 6) Calculate & print checksums
+        calculated_checksum = 0xFF - (sum(frame_data) & 0xFF)
+        print("Received Checksum:", f"{expected_checksum:02x}")
+        print("Calculated Checksum:", f"{calculated_checksum:02x}")
+
+        # 7) Compare checksums
+        if expected_checksum != calculated_checksum:
+            print("Checksum mismatch - ignoring frame.")
+            return None
+
+        # 8) Now parse the frame
+        #    The first byte of frame_data is the frame_type
+        frame_type = frame_data[0]
+
+        if frame_type == 0x81:
+            # 0x81 = Receive Packet (16-bit addr)
+            # According to XBee docs:
+            #   byte[0] = 0x81
+            #   byte[1..2] = 16-bit source address
+            #   byte[3] = RSSI
+            #   byte[4] = Receive options
+            #   byte[5..] = RF payload
+
+            rssi = -frame_data[3]
+            payload = frame_data[5:]
+            try:
+                decoded_message = payload.decode()
+                print(f"RSSI (Signal Strength : {rssi} dBm)")
+                print("Decoded message:", decoded_message)
+                #print("RSSI:", rssi)    
+                return decoded_message, rssi
+            except UnicodeDecodeError:
+                print("Error decoding payload")
+                return None
         
-        pass
+        elif frame_type == 0x89:
+            # TX status or something else, ignore
+            print(f"Got frame type 0x89 - ignoring")
+            return None
 
+        else:
+            # For all other frame types (e.g. 0x89 = TX Status), just ignore or print a debug
+            print(f"Got frame type: 0x{frame_type:02X}, ignoring.")
+            return None
+
+    
 
     # NOTE** Might need to check data length
     def __encode_data(self, data, address = "0000000000000000"):
