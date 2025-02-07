@@ -1,13 +1,14 @@
 import sys
-#sys.path.insert(1, 'C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure/Communication')
-sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
-#print(sys.path)
+sys.path.insert(1, '../')
+# sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
+# print(sys.path)
 
 from Communication.XBee import XBee
 # from Logs.Logger import Logger
 
 # PORT = "COM5"
-PORT = "/dev/cu.usbserial-D30DWZKY"
+# PORT = "/dev/cu.usbserial-D30DWZKY"
+PORT = "/dev/cu.usbserial-D30DWZL4"
 BAUD_RATE = 115200
 
 def main():

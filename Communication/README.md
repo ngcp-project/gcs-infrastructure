@@ -7,7 +7,7 @@
 ## Finding the serial port (device name)
 ### Mac
 1. Plug in XBee RF module
-2. Run `ls -l /dev/cu.usb`
+2. Run `ls -l /dev/cu.usb*`
 3. The device name should look similar to this:
 
 `/dev/cu.usbserial-D30DWZKT`

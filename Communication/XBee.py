@@ -16,6 +16,7 @@ class XBee(Serial):
         self.baudrate = baudrate
         self.ser = None
         self.status = status
+        self.frame_id = 0x01
         self.__transmitting = False
         self.__receiving = False
     
@@ -80,6 +81,9 @@ class XBee(Serial):
         - 2-byte Length
         - Frame Data (length bytes)
         - 1-byte Checksum
+
+        Returns:
+        ...
         """
 
         # 1) Read one byte
@@ -105,17 +109,17 @@ class XBee(Serial):
         print("Length:", length)
 
         # 4) Read 'length' bytes of frame data
-        frame_data = self.ser.read(length)
-        if len(frame_data) < length:
-            # Incomplete frame
-            return None
+        frame_data = b''
+        while len(frame_data) < length:
+            chunk = self.ser.read(length - len(frame_data))
+            frame_data += chunk
 
         print("Data Between Length & Checksum Fields:")
         print(" ".join(f"{b:02x}" for b in frame_data))
 
         # 5) Read the 1-byte checksum
         checksum_raw = self.ser.read(1)
-        print("DEBUG: checksum_raw =", checksum_raw)
+        # print("DEBUG: checksum_raw =", checksum_raw)
 
         if len(checksum_raw) < 1:
             print("DEBUG: No checksum byte read!")
@@ -137,33 +141,12 @@ class XBee(Serial):
         # 8) Now parse the frame
         #    The first byte of frame_data is the frame_type
         frame_type = frame_data[0]
-
         if frame_type == 0x81:
-            # 0x81 = Receive Packet (16-bit addr)
-            # According to XBee docs:
-            #   byte[0] = 0x81
-            #   byte[1..2] = 16-bit source address
-            #   byte[3] = RSSI
-            #   byte[4] = Receive options
-            #   byte[5..] = RF payload
-
-            rssi = -frame_data[3]
-            payload = frame_data[5:]
-            try:
-                decoded_message = payload.decode()
-                print(f"RSSI (Signal Strength : {rssi} dBm)")
-                print("Decoded message:", decoded_message)
-                #print("RSSI:", rssi)    
-                return decoded_message, rssi
-            except UnicodeDecodeError:
-                print("Error decoding payload")
-                return None
+            return self.__0x81(frame_data)
         
         elif frame_type == 0x89:
-            # TX status or something else, ignore
-            print(f"Got frame type 0x89 - ignoring")
-            return None
-
+            return self.__0x89(frame_data)
+        
         else:
             # For all other frame types (e.g. 0x89 = TX Status), just ignore or print a debug
             print(f"Got frame type: 0x{frame_type:02X}, ignoring.")
@@ -186,7 +169,8 @@ class XBee(Serial):
         frame.append(((len(data) + 11) // 256))  # Length (2 bytes)
         frame.append((len(data) + 11) % 256)
         frame.append(0x00)  # Frame type (1 byte)
-        frame.append(0x01)  # Frame ID (1 bytes)
+        frame.append(self.frame_id)  # Frame ID (1 bytes)
+        self.frame_id = self.frame_id % 0xff + 0x01
 
         for i in range(8):  # 64-bit address (8 bytes)
             frame.append(int(address[2 * i : 2 * i + 2], 16))
@@ -201,6 +185,40 @@ class XBee(Serial):
         print(''.join('{:02x} '.format(x) for x in frame))
 
         return frame
+
+    def __0x81(self, frame_data):
+        """Handle XBee Frame Type 81 (Frame Receive: 16-bit Address)
+
+        Args:
+          frame_data: Received bytes payload
+
+        Returns:
+          Decoded message & Received Signal Strength Indicator (RSSI), None if there is an error decoding message
+        """
+        rssi = -frame_data[3]
+        payload = frame_data[5:]
+        try:
+            decoded_message = payload.decode()
+            print(f"RSSI (Signal Strength : {rssi} dBm)")
+            print("Decoded message:", decoded_message)
+            #print("RSSI:", rssi)    
+            return decoded_message, rssi
+        except UnicodeDecodeError:
+            print("Error decoding payload")
+            return None
+
+    def __0x89(self, frame_data):
+        """Handle XBee Frame Type 89 (Transmit Status)
+
+        Args:
+          frame_data: Received bytes payload
+
+        Returns:
+          Delivery ID & status of transmitted message
+        """
+        id = frame_data[1]
+        status = frame_data[2]
+        return id, status
     
     # Frames may be sent separately (different lines)
     # https://pyserial.readthedocs.io/en/latest/pyserial_api.html
