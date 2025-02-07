@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 
 class Logger():
@@ -19,12 +20,12 @@ class Logger():
                 f.truncate()
                 f.close()
         file = "./Logs/log" + str(data) + ".txt"
-        # os.makedirs(os.path.dirname(file), exist_ok=True)
-        self.log = open(file, "w")
-        self.log.write(f"Log {data}\n")
+
+        logging.basicConfig(filename=file, encoding='utf-8', level=logging.DEBUG, format='%(asctime)s: %(message)s')
+        logging.info(f"Log {data}\n")
 
     def write(self, data):
-        self.log.write(f"{datetime.datetime.now()} {data}\n")
+        logging.info(data)
 
-    def close(self):
-        self.log.close()
+    # def close(self):
+        # self.log.close()

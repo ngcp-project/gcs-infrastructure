@@ -7,8 +7,8 @@ from Communication.XBee import XBee
 # from Logs.Logger import Logger
 
 # PORT = "COM5"
-# PORT = "/dev/cu.usbserial-D30DWZKY"
-PORT = "/dev/cu.usbserial-D30DWZL4"
+PORT = "/dev/cu.usbserial-D30DWZKY"
+# PORT = "/dev/cu.usbserial-D30DWZL4"
 BAUD_RATE = 115200
 
 def main():
