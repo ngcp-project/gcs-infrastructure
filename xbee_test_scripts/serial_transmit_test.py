@@ -1,12 +1,15 @@
 import sys
-#sys.path.insert(1, '../')
-sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
+sys.path.insert(1, '../')
+# sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
 
 from Communication.XBee import XBee
 
-PORT = "COM5"
+# PORT = "COM5"
+PORT = "/dev/cu.usbserial-D30DWZKY"
+# PORT = "/dev/cu.usbserial-D30DWZL4"
 BAUD_RATE = 115200
-
+DESTINATION = "0013A20042435EA9"
+# 00 13 A2 00 42 43 5E A9
 def main():
     print("XBEE SERIAL TRANSMIT TEST")
     print("===============================")
@@ -23,8 +26,11 @@ def main():
             data_to_send = input()
             print("Sending: %s" % data_to_send)
 
-            xbee.transmit_data(data_to_send)
+            xbee.transmit_data(data_to_send, DESTINATION)
             print("Data sent")
+            data = xbee.retrieve_data()
+            if data:
+                print("Retrieved data:", data)
         
         except Exception as e:
             print(f"Error: {e}")
@@ -41,7 +47,7 @@ def main():
     # Receive data
     # print(xbee.receive_data())
     # Close serial connection
-    # xbee.close()
+    xbee.close()
 
 if __name__ == '__main__':
     main()
