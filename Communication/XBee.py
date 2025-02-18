@@ -225,7 +225,7 @@ class XBee(Serial):
         payload = frame_data[5:]
         try:
             decoded_message = payload.decode()
-            self.logger.write(f"RSSI: {rssi}, Decoded message: {decoded_message}")
+            self.logger.write(f"Received payload. RSSI: {rssi}, Decoded message: {decoded_message}")
             print(f"RSSI (Signal Strength : {rssi} dBm)")
             print("Decoded message:", decoded_message)
             #print("RSSI:", rssi)    
@@ -246,7 +246,7 @@ class XBee(Serial):
         """
         id = frame_data[1]
         status = frame_data[2]
-        self.logger.write(f"Transmit status: ID: {id}, Status: {status}")
+        self.logger.write(f"Transmit status. ID: {id}, Status: {status}")
         return id, status
     
     # Frames may be sent separately (different lines)
