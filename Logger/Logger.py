@@ -24,8 +24,24 @@ class Logger():
         logging.basicConfig(filename=file, encoding='utf-8', level=logging.DEBUG, format='%(asctime)s: %(message)s')
         logging.info(f"Log {data}\n")
 
-    def write(self, data):
+    def write(self, data, level = logging.INFO):
         logging.info(data)
+        match level:
+            case logging.NOTSET:
+                pass
+            case logging.DEBUG:
+                logging.debug(data)
+            case logging.INFO:
+                logging.info(data)
+            case logging.WARNING:
+                logging.warning(data)
+            case logging.ERROR:
+                logging.error(data)
+            case logging.CRITICAL:
+                logging.critical(data)
+            case _:
+                pass
+
 
     # def close(self):
         # self.log.close()

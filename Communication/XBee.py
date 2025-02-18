@@ -1,21 +1,24 @@
 import serial
 from Communication.interfaces.Serial import Serial
+from Logger.Logger import Logger
 # import multiprocessing
 
 class XBee(Serial):
     # Initialize serial connection
-    def __init__(self, port, baudrate = 9600, status = False):
+    def __init__(self, port: str, baudrate: int = 9600, status: bool = False, logger: Logger = Logger()):
         """Initialize serial connection
 
         Args:
           port: Port of serial device.
           baudrate: Baudrate of serial device.
           status: Automatically receive status packets after a transmission.
+          logger: Logger instance
         """
         self.port = port
         self.baudrate = baudrate
         self.ser = None
         self.status = status
+        self.logger = logger
         self.frame_id = 0x01
         self.__transmitting = False
         self.__receiving = False
@@ -27,10 +30,16 @@ class XBee(Serial):
         Returns:
           True if success, False if failure.
         """
+        self.logger.write("Attempting to open serial XBee connection.")
+        
         try:
             self.ser = serial.Serial(self.port, self.baudrate, timeout=0)
-        except serial.SerialException:
-            print("Error opening serial port")
+            
+            self.logger.write("Serial port opened.")
+        
+        except serial.SerialException as e:
+            self.logger.write((f"Error opening serial port: {e}"))
+            print(f"Error opening serial port: {e}")
             return False
         
         return True
@@ -43,9 +52,19 @@ class XBee(Serial):
           True if success, False if failure (Error or port already closed).
         """
         if self.ser is not None:
-            self.ser.close()
-            self.ser = None
+
+            self.logger.write("Attempting to close serial XBee connection.")
+
+            try:
+                self.ser.close()
+                
+                self.logger.write("Serial port closed.")
+
+                self.ser = None
+            except Exception as e:
+                self.logger.write(f"Error closing serial port: {e}")
             return True
+        self.logger.write("Serial port is already closed.")
         return False
 
 
@@ -60,6 +79,7 @@ class XBee(Serial):
         """
         if self.ser is not None:
             self.__transmitting = True
+            self.logger.write(f"Transmitting data: {data} to {address}")
             self.ser.write(self.__encode_data(data, address))
             self.__transmitting = False
 
@@ -70,7 +90,8 @@ class XBee(Serial):
             # Return true once data is send to the XBee module over serial.
             # NOTE: This does not mean that a transmission is successful
             else:
-                return True
+                return 
+        
         return False
 
 
@@ -96,12 +117,14 @@ class XBee(Serial):
         if start_delim[0] != 0x7E:
             # Not the start delimiter -> leftover byte from a second frame?
             print(f"Pass {start_delim[0]:02x}")
+            self.logger.write(f"Pass {start_delim[0]:02x}", self.logging.WARNING)
             return None
 
         # 3) Read the next 2 bytes for length
         length_bytes = self.ser.read(2)
         if len(length_bytes) < 2:
             # Not enough data
+            self.logger.write(f"Pass. Unable to read length bytes", self.logging.WARNING)
             return None
 
         length = (length_bytes[0] << 8) + length_bytes[1]
@@ -123,6 +146,7 @@ class XBee(Serial):
 
         if len(checksum_raw) < 1:
             print("DEBUG: No checksum byte read!")
+            self.logger.write(f"Pass. No checksum byte read!", self.logging.WARNING)
             # Did not get the checksum byte
             return None
 
@@ -136,6 +160,7 @@ class XBee(Serial):
         # 7) Compare checksums
         if expected_checksum != calculated_checksum:
             print("Checksum mismatch - ignoring frame.")
+            self.logger.write(f"Checksum mismatch - ignoring frame: {frame_data} expected: {expected_checksum} received: {calculated_checksum}", self.logging.WARNING)
             return None
 
         # 8) Now parse the frame
@@ -149,6 +174,7 @@ class XBee(Serial):
         
         else:
             # For all other frame types (e.g. 0x89 = TX Status), just ignore or print a debug
+            self.logger.write(f"Pass. Unhandled frame type: {frame_data}", self.logging.ERROR)
             print(f"Got frame type: 0x{frame_type:02X}, ignoring.")
             return None
 
@@ -199,11 +225,13 @@ class XBee(Serial):
         payload = frame_data[5:]
         try:
             decoded_message = payload.decode()
+            self.logger.write(f"RSSI: {rssi}, Decoded message: {decoded_message}")
             print(f"RSSI (Signal Strength : {rssi} dBm)")
             print("Decoded message:", decoded_message)
             #print("RSSI:", rssi)    
             return decoded_message, rssi
         except UnicodeDecodeError:
+            self.logger.write(f"Error decoding payload. RSSI: {rssi}, Decoded message: {decoded_message}")
             print("Error decoding payload")
             return None
 
@@ -218,6 +246,7 @@ class XBee(Serial):
         """
         id = frame_data[1]
         status = frame_data[2]
+        self.logger.write(f"Transmit status: ID: {id}, Status: {status}")
         return id, status
     
     # Frames may be sent separately (different lines)
