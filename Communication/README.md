@@ -14,11 +14,13 @@
 
 ### Linux
 
-...
+1. Plug in XBee RF module
+2. Run `ls -l /dev/ttyUSB*` ?
 
 ### Windows
 
-...
+1. Plug in XBee RF module
+2. 
 
 ## Constructor
 
@@ -257,3 +259,193 @@ Unknown server [84]
 Unknown error [85]
 Invalid TLS configuration [86]
 Key not authorized [BB] -->
+
+## AT Command (API Mode - Frame Type 08)
+
+### Start delimiter (1 byte)
+
+### Length (2 bytes)
+
+### Frame Type (1 byte)
+
+### Frame ID (1 byte)
+
+### AT command (2 bytes)
+<!-- Networking
+Parameter ID | Name | Default | Description | Options
+:--: | :--: | :--: | -- | --
+CH | Channel | C | **Range: [0x0B - 0x1A]** The operating channel number (Uses IEEE 802.15.4 channel numbers).  Only modules with a matching CH can communicate with each other.
+ID | Network PAN ID | 3332 | **Range: [0x0 - OxFFFF]** The network PAN (Personal Area Network) ID. Only modules with a matching ID can communicate with each other. Set ID = OxFFFF to send message to all PANs.
+MM | MAC Mode | 0 | Configure the MAC Mode of the device. This enables/disables a Digi-proprietary header in the 802.15.4 RF packet and whether or not MAC ACKs should be used. Enabling the Digi header (MM = 0 or 3) allows duplicate packet detection and network discovery via ND and DN commands. Options 1 and 2 are strict 802.15.4 modes which are compatible with some third-party 802.15.4 devices. | <ul><li>802.15.4 + Digi header w/ACKS [0]</li><li>Strict 802.15.4 no ACKs [1]</li><li>Strict 802.15.4 with ACKs [2]</li><li>802.15.4 + Digi header no ACKS [3]</li></ul> 
+C8 | Compatibility Options
+NI | Node Identifier -->
+
+Networking
+* CH Channel
+* ID Network PAN ID
+* MM MAC Mode
+* C8 Compatibility Options
+    
+    Discovery Options
+    * NI Node Identifier
+    * DD Device Type Identifier
+    * NT Node Discover Time
+    * NO Node Discovery Options
+    
+    Coordinator/End Device Configuration
+    * CE Device Role
+    * A1 End Device Association
+    * A2 Coordinator Association
+    * SC Scan Channels
+    * AI Association Indication
+
+Addressing
+* SH Serial Number High
+* SL Serial Number Low
+* MY 16-bit Source Address
+* DH Destination Address High
+* DL Destination Address Low
+* RR XBee Retries
+* TO Transmit Options
+* NP Maximum Packet Payload Length
+
+Security
+* EE AES Encryption Enable
+* KY AES Encryption Key
+* DM Disable Device Functionality
+* US OTA Update Server
+* SA Secure Access Options
+* [NO PARAMETER ID] Secure Session Authentication
+
+Interfacing
+* PL TX Power Level
+* PP Output power in dBm
+* CA CCA Threshold
+* RN Random Delay Slots
+
+    MAC Diagnostics
+    * DB Last Packet RSSI
+    * EA ACK Failures
+    * EC CCA Failures
+
+Sleep Settings
+* SM Sleep Mode
+* SP Sleep Time
+* ST Wake Time
+* DP Disassociated Cyclic Sleep Period
+* SN Number of Cyclic Sleep Periods
+* SO Sleep Options
+
+Bluetooth Options
+* BT Bluetooth Enable
+* BL Bluetooth MAC Address
+* BI Bluetooth Identifier
+* BP BLE Advertisement Power Level
+* [NO PARAMETER ID] Bluetooth Authentication
+
+API Configuration
+* AP API Enable
+* AO API Output Mode
+* AZ Extend API Options
+
+UART Interface
+* BD UART Baud Rate
+* NB UART Parity
+* SB UART Stop Bits
+* FT Flow Control Threshold
+* RO Transparent Packetization Timeout
+
+    AT Command Options
+    * CC Command Sequence Character
+    * CT AT Command Mode Timeout
+    * GT Guard Times
+
+    UART Pin Configuration
+    * D6 DIO6/RTS Configuration
+    * D7 DIO7/CTS Configuration
+    * P3 DIO13/UART_DOUT Configuration
+    * P4 DIO14/UART_DIN Configuration
+
+I/O Settings
+* DO DIOO/ADO/Commissioning Button Configuration
+* D1 DIO1/AD1/SPI_nATTN Configuration
+* D2 DI02/AD2/SPI_CLK Configuration
+* D3 DIO3/AD3/SPI_nSSEL Configuration
+* D4 DIO4/SPI_MOSI Configuration
+* D5 DIO5 Association LED Configuration
+* D8 DI08/DTR/Sleep_Rq Configuration
+* D9 DIO9 Sleep Indicator Configuration
+* P2 DI012/SPI_MISO Configuration
+* PR Pull-up/down Resistor Enable
+* PD Pull-up/down Direction
+* LT Associate LED Blink Time
+
+    I/O Sampling
+    * IR IO Sampling Rate
+    * IC Digital I/O Change Detection
+    * AV Analog Voltage Reference
+    * IT Samples before TX
+    * IF Sleep Sample Rate
+
+    I/O Line Passing
+    * IA I/O Input Address
+    * IU Enable Serial Output For I/O Line Passing
+    * TO DO Output Timeout
+    * T1 D1 Output Timeout
+    * T2 D2 Output Timeout
+    * T3 D3 Output Timeout
+    * T4 D4 Output Timeout
+    * T5 D5 Output Timeout
+    * T6 D6 Output Timeout
+    * T7 D7 Outout Timeout
+    * T8 D8 Output Timeout
+    * T9 D9 Output Timeout
+    * Q0 PO Output Timeout
+    * Q1 P1 Output Timeout
+    * Q2 P2 Output Timeout
+
+Location
+* LX Location X - Latitude
+* LY Location Y - Longitude
+* LZ Location Z - Elevation
+
+Diagnostics - Firmware/Hardware Information
+* VR Firmware Version
+* VH Bootloader Version
+* HV Hardware Version
+* %C Hardware/Firmware Compatibility
+* R? Power Variant
+* %V Supply Voltage
+* TP Temperature
+* CK Configuration Checksum
+### Parameter value (0 - 256 bytes)
+
+### Checksum
+
+## AT Command Response (API MODE - Frame Type 88)
+
+### Start delimiter (1 byte)
+
+### Length (2 bytes)
+
+### Frame Type (1 byte)
+
+### Frame ID (1 byte)
+
+### AT command (2 bytes)
+
+### Command Status (1 byte)
+
+Status Code | Description
+:--: | --
+00 | OK
+01 | ERROR
+02 | Invalid Command
+03 | Invalid Parameter
+04 | Tx Failure
+
+### Command Data (0 - 256 bytes)
+Register data in binary format. If the register was set in the AT Command, then this field is not returned.
+
+### Checksum
+FF minus 8-bit sum of bytes between length and checksum fields.

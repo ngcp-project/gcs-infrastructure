@@ -4,6 +4,13 @@ import os
 
 class Logger():
     def __init__(self):
+        self.NOTSET = logging.NOTSET
+        self.DEBUG = logging.DEBUG
+        self.INFO = logging.INFO
+        self.WARNING = logging.WARNING
+        self.ERROR = logging.ERROR
+        self.CRITICAL = logging.CRITICAL
+        
         f1 = "./Logs/logs.txt"
         # Create Logs directory if it does not exist
         if not os.path.exists(f1):
@@ -25,7 +32,6 @@ class Logger():
         logging.info(f"Log {data}\n")
 
     def write(self, data, level = logging.INFO):
-        logging.info(data)
         match level:
             case logging.NOTSET:
                 pass
