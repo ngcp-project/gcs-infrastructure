@@ -1,8 +1,16 @@
 import datetime
+import logging
 import os
 
 class Logger():
     def __init__(self):
+        self.NOTSET = logging.NOTSET
+        self.DEBUG = logging.DEBUG
+        self.INFO = logging.INFO
+        self.WARNING = logging.WARNING
+        self.ERROR = logging.ERROR
+        self.CRITICAL = logging.CRITICAL
+        
         f1 = "./Logs/logs.txt"
         # Create Logs directory if it does not exist
         if not os.path.exists(f1):
@@ -19,12 +27,27 @@ class Logger():
                 f.truncate()
                 f.close()
         file = "./Logs/log" + str(data) + ".txt"
-        # os.makedirs(os.path.dirname(file), exist_ok=True)
-        self.log = open(file, "w")
-        self.log.write(f"Log {data}\n")
 
-    def write(self, data):
-        self.log.write(f"{datetime.datetime.now()} {data}\n")
+        logging.basicConfig(filename=file, encoding='utf-8', level=logging.DEBUG, format='%(asctime)s: %(message)s')
+        logging.info(f"Log {data}\n")
 
-    def close(self):
-        self.log.close()
+    def write(self, data, level = logging.INFO):
+        match level:
+            case logging.NOTSET:
+                pass
+            case logging.DEBUG:
+                logging.debug(data)
+            case logging.INFO:
+                logging.info(data)
+            case logging.WARNING:
+                logging.warning(data)
+            case logging.ERROR:
+                logging.error(data)
+            case logging.CRITICAL:
+                logging.critical(data)
+            case _:
+                pass
+
+
+    # def close(self):
+        # self.log.close()
