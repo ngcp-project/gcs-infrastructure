@@ -1,0 +1,9 @@
+2025-02-18 14:58:53,396: Log 3
+
+2025-02-18 14:58:53,396: Attempting to open serial XBee connection.
+2025-02-18 14:58:53,401: Serial port opened.
+2025-02-18 14:58:56,604: Transmitting data: Hello to 0013A20042435EA9
+2025-02-18 14:59:02,893: Transmitting data: hey to 0013A20042435EA9
+2025-02-18 14:59:02,893: Transmit status. ID: 1, Status: 2
+2025-02-18 14:59:23,334: Transmitting data: hello to 0013A20042435EA9
+2025-02-18 14:59:23,334: Transmit status. ID: 2, Status: 2

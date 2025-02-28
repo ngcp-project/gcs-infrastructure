@@ -1,0 +1,8 @@
+2025-02-18 15:06:25,160: Log 4
+
+2025-02-18 15:06:25,161: Attempting to open serial XBee connection.
+2025-02-18 15:06:25,164: Serial port opened.
+2025-02-18 15:06:29,885: Transmitting data: hello to 0013A20042435EA9
+2025-02-18 15:06:29,886: Received payload. RSSI: -22, Decoded message: giuygu
+2025-02-18 15:06:37,814: Transmitting data: joshua to 0013A20042435EA9
+2025-02-18 15:06:37,815: Transmit status. ID: 1, Status: 0
