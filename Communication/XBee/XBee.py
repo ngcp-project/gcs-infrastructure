@@ -6,8 +6,8 @@ from Logger.Logger import Logger
 # import multiprocessing
 
 class XBee(Serial):
-    # Initialize serial connection
-    def __init__(self, port: str, baudrate: int = 115200, status: bool = False, logger: Logger = None, config_file: str = None):
+    # Configure serial port
+    def __init__(self, port: str = None, baudrate: int = 115200, status: bool = False, logger: Logger = None, config_file: str = None):
         """Initialize serial connection
 
         Args:

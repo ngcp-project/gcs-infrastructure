@@ -1,16 +1,15 @@
 # XBee Serial Library
 
-This library allows for the communication between a computer and a XBee RF module over a serial port. 
+This library allows for the communication between a computer and a XBee RF module over the serial port. 
 
-## System Requirements
+## Requirements
 * Linux, Windows, or macOS
 * Python 2.7 or Python 3.4 and newer
-<!-- * pyserial 3.5 -->
 
 ## Getting Started
 Clone the GCS Infrastructure GitHub repository
 ```
-https://github.com/ngcp-project/gcs-infrastructure
+git clone https://github.com/ngcp-project/gcs-infrastructure
 ```
 Install pyserial 3.5
 ```

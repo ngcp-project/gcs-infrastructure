@@ -8,19 +8,36 @@
 ### Mac
 1. Plug in XBee RF module
 2. Run `ls -l /dev/cu.usb*`
-3. The device name should look similar to this:
 
-`/dev/cu.usbserial-D30DWZKT`
+The device name should look similar to this:
+```
+/dev/cu.usbserial-D30DWZKT
+```
 
 ### Linux
 
 1. Plug in XBee RF module
-2. Run `ls -l /dev/ttyUSB*` ?
+2. Run `ls -l /dev/ttyUSB*` 
+
+The device name should look similar to this:
+
+```
+/dev/ttyUSB0
+```
 
 ### Windows
 
 1. Plug in XBee RF module
-2. 
+2. Open Windows Device Manager.
+3. Find "Ports (COM & LPT)" in the list.
+4. Expand "Ports (COM & LPT)" to see the names of all serial ports.
+5. The device name should be listed as a "USB Serial Port" and be in parentesis.
+
+The device name should look similar to this:
+
+```
+COM3
+```
 
 ## Constructor
 
@@ -42,7 +59,6 @@ PORT = "/dev/cu.usbserial-D30DWZKT"
 BAUD_RATE = 115200
 xbee = XBee(PORT, BAUD_RATE)
 ```
-
 ## Methods
 
 `open()`
@@ -449,3 +465,5 @@ Register data in binary format. If the register was set in the AT Command, then 
 
 ### Checksum
 FF minus 8-bit sum of bytes between length and checksum fields.
+
+# Test
