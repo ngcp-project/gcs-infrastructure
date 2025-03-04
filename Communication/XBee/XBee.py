@@ -7,12 +7,12 @@ from Logger.Logger import Logger
 
 class XBee(Serial):
     # Initialize serial connection
-    def __init__(self, port: str, baudrate: int = 9600, status: bool = False, logger: Logger = None, config_file: str = None):
+    def __init__(self, port: str, baudrate: int = 115200, status: bool = False, logger: Logger = None, config_file: str = None):
         """Initialize serial connection
 
         Args:
           port: Port of serial device.
-          baudrate: Baudrate of serial device.
+          baudrate: Baudrate of serial device (/port)
           status: Automatically receive status packets after a transmission.
           logger: Logger instance
         """
@@ -22,12 +22,14 @@ class XBee(Serial):
         self.status = status
         if logger is None:
             self.logger = Logger()
-            self.logger.write("LOGGER CREATED IN XBee.py")
+            self.logger.write("LOGGER CREATED By XBee.py")
         else:
             self.logger = logger
-        self.timeout = 0.025
+        self.timeout = 0.025 # Allow programmer to configure timeout?
         self.frame_id = 0x01
-        self.config_file = config_file
+
+        self.config_file = config_file # Add AT_Config.py file
+
         self.__transmitting = False
         self.__receiving = False
     
@@ -278,10 +280,11 @@ class XBee(Serial):
         """Handle XBee Frame Type 81 (Frame Receive: 16-bit Address)
 
         Args:
-          frame_data: Received bytes payload
+          frame_data: Received bytes (between length and checksum fields)
 
         Returns:
-          Decoded message & Received Signal Strength Indicator (RSSI), None if there is an error decoding message
+          xxxxDecoded message & Received Signal Strength Indicator (RSSI), None if there is an error decoding message
+          Returns 0x81 class (frame_type, frame_id, payload, rssi, ...)
         """
         rssi = -frame_data[3]
         payload = frame_data[5:]
@@ -298,6 +301,14 @@ class XBee(Serial):
             return None
         
     def __0x88(self, frame_data):
+        """Handle XBee Frame Type 88 (AT Command Response)
+
+        Args:
+          frame_data: Received bytes (between length and checksum fields)
+
+        Returns:
+          Returns 0x88 class (frame_type, frame_id, at_command, command_status_ command_data)
+        """
         # print(" ".join(f"{b:02x}" for b in frame_data))
         # print(frame_data)
         frame_type = frame_data[0]
@@ -311,10 +322,11 @@ class XBee(Serial):
         """Handle XBee Frame Type 89 (Transmit Status)
 
         Args:
-          frame_data: Received bytes payload
+          frame_data: Received bytes (between length and checksum fields)
 
         Returns:
-          Delivery ID & status of transmitted message
+          xxxxDelivery ID & status of transmitted message
+          Returns 0x89 class (frame_type, frame_id, ...)
         """
         id = frame_data[1]
         status = frame_data[2]
