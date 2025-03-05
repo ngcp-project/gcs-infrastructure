@@ -6,22 +6,13 @@
 > __init__(port=None, baudrate=115200, status=False, logger=None)
 >```
 
-> ```
-> __init__(port=None, baudrate=115200, status=False, logger=None)
->```
-
-> ```__init__(port=None, baudrate=115200, status=False, logger=None)```
-
-> `__init__(port=None, baudrate=115200, status=False, logger=None)`
-
-
 Configure the serial port
+
 > [!NOTE]
 > Serial ports are not opened on object creation.
 
 
-**Parameters**
-
+**Parameters:**
 * **port** (str or None) - Port of serial device.
 * **baudrate** (int) - Baudrate of serial device.
 * **status** (bool) - Automatically receive status packets after a transmission.
@@ -35,7 +26,7 @@ See [Frame Details][transmit_status] for details regarding the XBee status packe
 
 A Logger instance will be created if it is not provided.
 
-### Example
+**Example:**
 
 ```py
 from Communication.XBee.XBee import XBee
@@ -47,26 +38,36 @@ xbee = XBee(PORT, BAUD_RATE) # status and logger will be set to False and None r
 
 ## Methods
 
-> ```
+> ```py
 > open()
 >```
+Open a connection over the serial port.
+
+**Returns:** 
+* **True** if success, **False** if failure.
+
+**Return type:** 
+* bool
+
+**Throws:**
+* **SerialException** - if there is an error opening the serial port
 
 > ```py
 > open()
 >```
 Open a connection over the serial port.
 
-**Returns:**
-* **True** if success, **False** if failure.
+| <!-- --> | <!-- --> |
+| - | - |
+| **Returns** | **True** if success, **False** if failure. |
+| **Return type** | bool | 
+| **Throws:** | **SerialException** - if there is an error opening the serial port |
 
-**Throws:**
-* **SerialException** - if there is an error opening the serial port
-
-> `close()`
-
-> ```
-> close()
-> ```
+| | |
+| - | - |
+| **Returns** | **True** if success, **False** if failure. |
+| **Return type** | bool | 
+| **Throws:** | **SerialException** - if there is an error opening the serial port |
 
 > ```py
 > close()
