@@ -10,6 +10,10 @@
 > __init__(port=None, baudrate=115200, status=False, logger=None)
 >```
 
+> ```__init__(port=None, baudrate=115200, status=False, logger=None)```
+
+> `__init__(port=None, baudrate=115200, status=False, logger=None)`
+
 
 Configure the serial port
 > [!NOTE]
@@ -46,6 +50,10 @@ xbee = XBee(PORT, BAUD_RATE) # status and logger will be set to False and None r
 > ```
 > open()
 >```
+
+> ```py
+> open()
+>```
 Open a connection over the serial port.
 
 **Returns:**
@@ -55,6 +63,10 @@ Open a connection over the serial port.
 * **SerialException** - if there is an error opening the serial port
 
 > `close()`
+
+> ```
+> close()
+> ```
 
 > ```py
 > close()
