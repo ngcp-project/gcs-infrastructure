@@ -12,11 +12,15 @@ Configure the serial port
 > Serial ports are not opened on object creation.
 
 
-**Parameters:**
+
+| <!-- --> | <!-- --> |
+| - | - |
+| **Parameters** | <ul><li>**port** (str or None) - Port of serial device.</li><li>**baudrate** (int) - Baudrate of serial device.</li></li><li>**port** (str or None) - Port of serial device.</li></li><li>**status** (bool) - Automatically receive status packets after a transmission.</li></li><li>**logger** (Logger) - Logger object from Logger.Logger used to record data such as sent and received data.</li></ul>
+<!-- * **port** (str or None) - Port of serial device. <br> **baudrate** (int) - Baudrate of serial device.
 * **port** (str or None) - Port of serial device.
 * **baudrate** (int) - Baudrate of serial device.
 * **status** (bool) - Automatically receive status packets after a transmission.
-* **logger** (Logger) - Logger object from Logger.Logger used to record data such as sent and received data.
+* **logger** (Logger) - Logger object from Logger.Logger used to record data such as sent and received data. -->
 
 See [Serial Port][serial_port] for details on finding the correct serial port name.
 
@@ -43,27 +47,7 @@ xbee = XBee(PORT, BAUD_RATE) # status and logger will be set to False and None r
 >```
 Open a connection over the serial port.
 
-**Returns:** 
-* **True** if success, **False** if failure.
-
-**Return type:** 
-* bool
-
-**Throws:**
-* **SerialException** - if there is an error opening the serial port
-
-> ```py
-> open()
->```
-Open a connection over the serial port.
-
 | <!-- --> | <!-- --> |
-| - | - |
-| **Returns** | **True** if success, **False** if failure. |
-| **Return type** | bool | 
-| **Throws:** | **SerialException** - if there is an error opening the serial port |
-
-| | |
 | - | - |
 | **Returns** | **True** if success, **False** if failure. |
 | **Return type** | bool | 
