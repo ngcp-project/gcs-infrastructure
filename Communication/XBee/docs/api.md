@@ -11,16 +11,9 @@ Configure the serial port
 > [!NOTE]
 > Serial ports are not opened on object creation.
 
-
-
 | <!-- --> | <!-- --> |
 | - | - |
-| **Parameters** | <ul><li>**port** (str or None) - Port of serial device.</li><li>**baudrate** (int) - Baudrate of serial device.</li></li><li>**port** (str or None) - Port of serial device.</li></li><li>**status** (bool) - Automatically receive status packets after a transmission.</li></li><li>**logger** (Logger) - Logger object from Logger.Logger used to record data such as sent and received data.</li></ul>
-<!-- * **port** (str or None) - Port of serial device. <br> **baudrate** (int) - Baudrate of serial device.
-* **port** (str or None) - Port of serial device.
-* **baudrate** (int) - Baudrate of serial device.
-* **status** (bool) - Automatically receive status packets after a transmission.
-* **logger** (Logger) - Logger object from Logger.Logger used to record data such as sent and received data. -->
+| **Parameters** | <ul><li>**port** (`str` or `None`) - Port of serial device.</li><li>**baudrate** (`int`) - Baudrate of serial device.</li><li>**status** (`bool`) - Automatically receive status packets after a transmission.</li><li>**logger** (`Logger`) - Logger object from Logger.Logger used to record data such as sent and received data.</li></ul> |
 
 See [Serial Port][serial_port] for details on finding the correct serial port name.
 
