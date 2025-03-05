@@ -2,7 +2,13 @@
 ## Constructor
 
 
-> **\_\_init__**(port=None, baudrate=115200, status=False, logger=None)
+> ```py
+> __init__(port=None, baudrate=115200, status=False, logger=None)
+>```
+
+> ```
+> __init__(port=None, baudrate=115200, status=False, logger=None)
+>```
 
 
 Configure the serial port
@@ -25,7 +31,7 @@ See [Frame Details][transmit_status] for details regarding the XBee status packe
 
 A Logger instance will be created if it is not provided.
 
-**Example**
+### Example
 
 ```py
 from Communication.XBee.XBee import XBee
@@ -37,8 +43,9 @@ xbee = XBee(PORT, BAUD_RATE) # status and logger will be set to False and None r
 
 ## Methods
 
-> `open()`
-
+> ```
+> open()
+>```
 Open a connection over the serial port.
 
 **Returns:**
@@ -47,14 +54,18 @@ Open a connection over the serial port.
 **Throws:**
 * **SerialException** - if there is an error opening the serial port
 
-> **close()**
+> `close()`
+
+> ```py
+> close()
+> ```
 
 Close a connection over the serial port.
 
 **Returns:**
 * **True** if success, **False** if failure.
 
-`transmit_data(string data, string address)`
+> `transmit_data(string data, string address)`
 
 Send data to another XBee module(s)
 
@@ -75,5 +86,4 @@ Check for incomming data
 
 [serial_port]: ./serial_port.md
 [frame_details]: ./frame_details.md
-[transmit_status]: ./frame_details.md#XBee%20Transmit%20Status(API%20Mode%20-%20Frame%20Type%2089)
-[transmit_status]: ./frame_details.md#Test
+[transmit_status]: ./frame_details.md#xbee-transmit-statusapi-mode---frame-type-89
