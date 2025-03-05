@@ -239,6 +239,9 @@ class XBee(Serial):
         return frame
     
     def request_at_command_data(self, id):
+        if id == None:
+            return None
+
         frame = bytearray()
         frame.append(0x7E) # Start delimiter (1 byte)
         frame.append(0x00) # Length (2 bytes)

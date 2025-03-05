@@ -15,21 +15,23 @@ Install pyserial 3.5
 ```
 pip install pyserial==3.5
 ```
-See the [XBee Serial API][api.md] page for method details
+See the [XBee Serial API][api] page for method details
 
-See the [Examples][examples.md] page for example implementations
+See the [Examples][examples] page for example implementations
 
 
 ## Getting Help
 Any questions? Feel free to @ GCS Infrastructure on Discord.
 
 ## Resources
-* [XBee Serial API][api.md]
-* [Examples][examples.md]
-* [Frame Details][frame_details.md]
+* [Finding the serial port (device name)][serial_port]
+* [XBee Serial API][api]
+* [Examples][examples]
+* [Frame Details][frame_details]
 
 
 <!-- Links -->
-[api.md]: ./docs/api.md
-[examples.md]: ./docs/examples.md
-[frame_details.md]: ./docs/frame_details.md
+[api]: ./docs/api.md
+[examples]: ./docs/examples.md
+[frame_details]: ./docs/frame_details.md
+[serial_port]: ./docs/serial_port.md

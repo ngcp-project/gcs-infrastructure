@@ -106,9 +106,20 @@ Check for incomming data
 | **Returns** | `str` if ther is incomming data. `None` otherwise.
 | **Return type** | `str` or `None`
 
+<br>
+
+> [!NOTE]
+> The below methods are used by GCS for testing
 
 
+> ```py
+> request_at_command_data(self, id)
+> ```
 
+Request and retrieve configuration detail of XBee device.
+
+
+<!-- Links -->
 [serial_port]: ./serial_port.md
 [frame_details]: ./frame_details.md
 [transmit_status]: ./frame_details.md#xbee-transmit-statusapi-mode---frame-type-89
