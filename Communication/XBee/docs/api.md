@@ -11,9 +11,13 @@ Configure the serial port
 > [!NOTE]
 > Serial ports are not opened on object creation.
 
+<br>
+
 | <!-- --> | <!-- --> |
 | - | - |
 | **Parameters** | <ul><li>**port** (`str` or `None`) - Port of serial device.</li><li>**baudrate** (`int`) - Baudrate of serial device.</li><li>**status** (`bool`) - Automatically receive status packets after a transmission.</li><li>**logger** (`Logger`) - Logger object from Logger.Logger used to record data such as sent and received data.</li></ul> |
+
+<br>
 
 See [Serial Port][serial_port] for details on finding the correct serial port name.
 
@@ -40,11 +44,20 @@ xbee = XBee(PORT, BAUD_RATE) # status and logger will be set to False and None r
 >```
 Open a connection over the serial port.
 
+<br>
+
 | <!-- --> | <!-- --> |
 | - | - |
-| **Returns** | **True** if success, **False** if failure. |
-| **Return type** | bool | 
-| **Throws:** | **SerialException** - if there is an error opening the serial port |
+| **Returns** | `True` if success, `False` if failure. |
+| **Return type** | `bool` | 
+| **Throws:** | `SerialException` if there is an error opening the serial port |
+
+<br>
+
+A `SerialException` typically occurs if:
+* The XBee module is not plugged in
+* The port/device name is incorrect
+* The port is in use (e.g. There is another program accessing the same port )
 
 > ```py
 > close()
@@ -52,27 +65,49 @@ Open a connection over the serial port.
 
 Close a connection over the serial port.
 
-**Returns:**
-* **True** if success, **False** if failure.
+<br>
 
-> `transmit_data(string data, string address)`
+| <!-- --> | <!-- --> |
+| - | - |
+| **Returns** | `True` if success, `False` if failure. |
+| **Return type** | `bool` | 
+
+<br>
+
+> ```py
+> transmit_data(data, address="0000000000000000")
+> ```
+
+> [!NOTE]
+> Work in progress. Method currently does not return a status.
 
 Send data to another XBee module(s)
 
-**Parameters:**
+<br>
 
-* *data* (str) -  String data to transmit.
-* *address* (str) - Address of destination XBee module. "00000000" if no value is provided.
+| <!-- --> | <!-- --> |
+| - | - |
+| **Parameters** | <ul><li>**data** (`str`) -  String data to transmit.</li><li>**address** (`str`) - Address of destination XBee module. `"0000000000000000"` if no value is provided.</li></ul> |
+| **Returns** | Status of transmit request. See [Frame Details][transmit_status] for more details. |
+| **Return type** | `int`|
 
-**Returns:**
-* *True* if success, *False* if failure.
+<br>
 
-`retrieve_data()`
+> ```py
+> retrieve_data()
+> ```
 
 Check for incomming data
 
-**Returns:**
-* *String* if ther is incomming data. *None* otherwise.
+<br>
+
+| <!-- --> | <!-- --> |
+| - | - |
+| **Returns** | `str` if ther is incomming data. `None` otherwise.
+| **Return type** | `str` or `None`
+
+
+
 
 [serial_port]: ./serial_port.md
 [frame_details]: ./frame_details.md
