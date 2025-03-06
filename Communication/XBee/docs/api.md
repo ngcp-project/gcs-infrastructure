@@ -104,7 +104,7 @@ Check for incomming data
 | <!-- --> | <!-- --> |
 | - | - |
 | **Returns** | `str` if ther is incomming data. `None` otherwise.
-| **Return type** | `str` or `None`
+| **Return type** | `0x81` `0x88 ``0x89` or `None`
 
 <br>
 
