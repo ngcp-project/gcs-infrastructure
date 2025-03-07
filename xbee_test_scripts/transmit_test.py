@@ -14,11 +14,7 @@ BAUD_RATE = 115200
 
 xbee = XBee(PORT, BAUD_RATE)
 logger = Logger()
-
-try:
-    xbee.open()
-except Exception as e:
-    print(f"Error: {e}")
+    
 counter = 0
 def func():
     global counter
@@ -44,6 +40,11 @@ def set_interval(func, sec):
 def main():
     print("XBEE TRANSMIT TEST")
     print("===============================")
+    try:
+        xbee.open()
+    except Exception as e:
+        print(f"Error: {e}")
+        return
     
     set_interval(func, 1)
 
