@@ -4,33 +4,30 @@ sys.path.insert(1, '../')
 
 import threading
 from Logger.Logger import Logger
-from Communication.XBee import XBee
+from Communication.XBee.XBee import XBee
 
 # PORT = "COM5"
 PORT = "/dev/cu.usbserial-D30DWZL4"
 BAUD_RATE = 115200
+CONFIG_FILE = "AT_Command_List.txt"
 # DESTINATION = "0013A20042435EA9"
 # 00 13 A2 00 42 43 5E A9
 
-xbee = XBee(PORT, BAUD_RATE)
 logger = Logger()
-
-try:
-    xbee.open()
-except Exception as e:
-    print(f"Error: {e}")
+xbee = XBee(port=PORT, baudrate=BAUD_RATE, logger=Logger(), config_file=CONFIG_FILE)
+    
 counter = 0
 def func():
     global counter
     xbee.transmit_data("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(counter))
-    logger.write("Sent AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(counter))
+    # logger.write("Sent AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(counter))
     counter += 1
 
     print("Data sent")
     data = xbee.retrieve_data()
     if data:
-        print("Retrieved data:", data)
-        logger.write(data)
+        print("transmit_test.py -> Retrieved data:", data)
+        logger.write(f"transmit_test.py -> Retrieved data: {data}")
 
 
 def set_interval(func, sec):
@@ -44,6 +41,11 @@ def set_interval(func, sec):
 def main():
     print("XBEE TRANSMIT TEST")
     print("===============================")
+    try:
+        xbee.open()
+    except Exception as e:
+        print(f"Error: {e}")
+        return
     
     set_interval(func, 1)
 

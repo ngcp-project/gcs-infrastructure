@@ -5,7 +5,7 @@ import threading
 # from  multiprocessing import Process
 # from pynput import keyboard
 
-from Communication.XBee import XBee
+from Communication.XBee.XBee import XBee
 
 # PORT = "/dev/cu.usbserial-D30DWZL4" # Replace with your actual serial port. Plug in module and run "ls -l /dev/cu.usb*"
 PORT = "/dev/cu.usbserial-D30DWZKY"

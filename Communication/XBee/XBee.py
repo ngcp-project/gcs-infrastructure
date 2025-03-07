@@ -2,17 +2,18 @@ import re
 import serial
 import time
 from Communication.interfaces.Serial import Serial
+from Communication.XBee.Frames import x81, x88, x89
 from Logger.Logger import Logger
 # import multiprocessing
 
 class XBee(Serial):
-    # Initialize serial connection
-    def __init__(self, port: str, baudrate: int = 9600, status: bool = False, logger: Logger = None, config_file: str = None):
+    # Configure serial port
+    def __init__(self, port: str = None, baudrate: int = 115200, status: bool = False, logger: Logger = None, config_file: str = None):
         """Initialize serial connection
 
         Args:
           port: Port of serial device.
-          baudrate: Baudrate of serial device.
+          baudrate: Baudrate of serial device (/port)
           status: Automatically receive status packets after a transmission.
           logger: Logger instance
         """
@@ -22,26 +23,40 @@ class XBee(Serial):
         self.status = status
         if logger is None:
             self.logger = Logger()
-            self.logger.write("LOGGER CREATED IN XBee.py")
+            self.logger.write("LOGGER CREATED By XBee.py")
         else:
             self.logger = logger
-        self.timeout = 0.025
+        self.timeout = 0.025 # Allow programmer to configure timeout?
         self.frame_id = 0x01
-        self.config_file = config_file
+
+        self.config_file = config_file # Add AT_Config.py file
+
         self.__transmitting = False
         self.__receiving = False
+
+        self.logger.write(f"port: {self.port}, baudrate: {self.baudrate}, timeout: {self.timeout}, config_file: {self.config_file}")
     
 
     def open(self):
-        """Opens serial port.
+        """Opens the serial port.
 
         Returns:
-          True if success, False if failure.
+          True if success, False if failure (There is already an open port, close the port before opening another one).
+        Raises:
+          SerialException if there is an error opening the serial port
         """
         self.logger.write("Attempting to open serial XBee connection.")
+
+        if self.ser is not None:
+            self.logger.write(f"A serial connection is already open. ser: {self.ser}")
+            return False
         
         try:
             self.ser = serial.Serial(self.port, self.baudrate, timeout=0)
+
+            self.ser.reset_input_buffer()
+            self.ser.reset_output_buffer()
+            time.sleep(0.5)
             
             self.logger.write("Serial port opened.")
             if self.config_file is not None:
@@ -49,11 +64,9 @@ class XBee(Serial):
         
         except serial.SerialException as e:
             self.logger.write((f"Error opening serial port: {e}"))
-            print(f"Error opening serial port: {e}")
-            return False
-        
+            # print(f"Error opening serial port: {e}")
+            raise serial.SerialException(e)
         return True
-    
 
     def close(self):
         """Close serial port.
@@ -72,7 +85,8 @@ class XBee(Serial):
 
                 self.ser = None
             except Exception as e:
-                self.logger.write(f"Error closing serial port: {e}")
+                self.logger.write(f"An error occured when closing serial port: {e}")
+                raise Exception(e)
             return True
         self.logger.write("Serial port is already closed.")
         return False
@@ -87,20 +101,21 @@ class XBee(Serial):
         Returns:
           True if success, False if failure.
         """
-        if self.ser is not None:
-            self.__transmitting = True
-            self.logger.write(f"Transmitting data: {data} to {address}")
-            self.ser.write(self.__encode_data(data, address))
-            self.__transmitting = False
 
-            # If retrieve status is true
-            if(retrieveStatus):
-                self.__receiving = True
-                return self.__retrieve_status()
-            # Return true once data is send to the XBee module over serial.
-            # NOTE: This does not mean that a transmission is successful
-            else:
-                return 
+        # Check if a serial port is open
+        if self.ser is None:
+            raise serial.SerialException("Error: Serial port is not open")
+        
+        self.__transmitting = True
+        self.logger.write(f"Transmitting data: {data} to {address}")
+        self.ser.write(self.__encode_data(data, address))
+        self.__transmitting = False
+
+        # If retrieve status is true
+        if(retrieveStatus):
+            self.__receiving = True
+            return self.__retrieve_status()
+        # Return true once data is send to the XBee module over serial.
         
         return False
 
@@ -118,6 +133,10 @@ class XBee(Serial):
         - 0x88: (frame_type, frame_id, at_command, command_status, command_data)
         - 0x89: 
         """
+
+        # Check if a serial port is open
+        if self.ser is None:
+            raise serial.SerialException("Error: Serial port is not open")
 
         # 1) Read one byte
         start_delim = self.ser.read(1)
@@ -237,6 +256,14 @@ class XBee(Serial):
         return frame
     
     def request_at_command_data(self, id):
+
+        # Check if a serial port is open
+        if self.ser is None:
+            raise serial.SerialException("Error: Serial port is not open")
+        
+        if id == None:
+            return None
+
         frame = bytearray()
         frame.append(0x7E) # Start delimiter (1 byte)
         frame.append(0x00) # Length (2 bytes)
@@ -256,9 +283,9 @@ class XBee(Serial):
         timeout_start = time.time()
         while time.time() < timeout_start + self.timeout:
             time.sleep(0.001)
-            response = self.retrieve_data()
+            response: x88 = self.retrieve_data()
 
-            if response is not None and response[0] == 0x88:
+            if response is not None and response.frame_type == 0x88:
                 self.logger.write(f"Response: {response}")
                 return response
             
@@ -274,30 +301,44 @@ class XBee(Serial):
         # else:
         #     return 
 
-    def __0x81(self, frame_data):
+    def __0x81(self, frame_data) -> x81:
         """Handle XBee Frame Type 81 (Frame Receive: 16-bit Address)
 
         Args:
-          frame_data: Received bytes payload
+          frame_data: Received bytes (between length and checksum fields)
 
         Returns:
-          Decoded message & Received Signal Strength Indicator (RSSI), None if there is an error decoding message
+          xxxxDecoded message & Received Signal Strength Indicator (RSSI), None if there is an error decoding message
+          Returns 0x81 class (frame_type, frame_id, payload, rssi, ...)
         """
+        frame_type = frame_data[0]
+        source_address = frame_data[1:3]
         rssi = -frame_data[3]
-        payload = frame_data[5:]
+        options = frame_data[4]
+        data = frame_data[5:]
         try:
-            decoded_message = payload.decode()
+            decoded_message = data.decode()
             self.logger.write(f"Received payload. RSSI: {rssi}, Decoded message: {decoded_message}")
             print(f"RSSI (Signal Strength : {rssi} dBm)")
             print("Decoded message:", decoded_message)
             #print("RSSI:", rssi)    
-            return decoded_message, rssi
+            frame = x81(frame_type, source_address, rssi, options, decoded_message)
+            self.logger.write(f"[Frame Receive: 16-bit Address] Frame Type: {frame.frame_type}, Source Address: {frame.source_address}, RSSI: {frame.rssi}, Options: {frame.options}, Data: {frame_data}")
+            return frame
         except UnicodeDecodeError:
             self.logger.write(f"Error decoding payload. RSSI: {rssi}, Decoded message: {decoded_message}")
             print("Error decoding payload")
             return None
         
-    def __0x88(self, frame_data):
+    def __0x88(self, frame_data) -> x88:
+        """Handle XBee Frame Type 88 (AT Command Response)
+
+        Args:
+          frame_data: Received bytes (between length and checksum fields)
+
+        Returns:
+          Returns 0x88 class (frame_type, frame_id, at_command, command_status_ command_data)
+        """
         # print(" ".join(f"{b:02x}" for b in frame_data))
         # print(frame_data)
         frame_type = frame_data[0]
@@ -305,26 +346,40 @@ class XBee(Serial):
         at_command = frame_data[2:4]
         command_status = frame_data[4]
         command_data = frame_data[5:]
-        return frame_type, frame_id, at_command, command_status, command_data
+        frame = x88(frame_type, frame_id, at_command, command_status, command_data)
+        self.logger.write(f"[AT Command Response] Frame Type: {frame.frame_type}, Frame ID: {frame.frame_id}, AT Command: {frame.at_command}, Command Status: {frame.status}, Command Data: {frame.data}")
+        return frame
 
-    def __0x89(self, frame_data):
+    def __0x89(self, frame_data) -> x89:
         """Handle XBee Frame Type 89 (Transmit Status)
 
         Args:
-          frame_data: Received bytes payload
+          frame_data: Received bytes (between length and checksum fields)
 
         Returns:
-          Delivery ID & status of transmitted message
+          xxxxDelivery ID & status of transmitted message
+          Returns 0x89 class (frame_type, frame_id, ...)
         """
-        id = frame_data[1]
-        status = frame_data[2]
-        self.logger.write(f"Transmit status. ID: {id}, Status: {status}")
-        return id, status
+        frame_type = frame_data[0]
+        frame_id = frame_data[1]
+        delivery_status = frame_data[2]
+        frame: x89 = x89(frame_type, frame_id, delivery_status)
+
+        self.logger.write(f"[Transmit status] Frame Type: {frame.frame_type}, Frame ID: {frame.frame_id}, Status: {frame.status}")
+        return frame
     
     def read_config(self, filename):
         """
         Reads AT Commands from a file and logs their execution.
+
+        Args:
+          filename: Filename of file with a list of AT commands to execute.
         """
+
+        # Check if a serial port is open
+        if self.ser is None:
+            raise serial.SerialException("Error: Serial port is not open")
+
         with open(filename, 'r') as file:
             lines = file.readlines()
         
