@@ -88,8 +88,8 @@ Send data to another XBee module(s)
 | <!-- --> | <!-- --> |
 | - | - |
 | **Parameters** | <ul><li>**data** (`str`) -  String data to transmit.</li><li>**address** (`str`) - Address of destination XBee module. `"0000000000000000"` if no value is provided.</li></ul> |
-| **Returns** | Status of transmit request. See [Frame Details][transmit_status] for more details. |
-| **Return type** | `int`|
+| **Returns** | Status of transmit request. See [0x89 Tx (Transmit) Status][transmit_status] for more details. |
+| **Return type** | `int` |
 
 <br>
 
@@ -97,19 +97,22 @@ Send data to another XBee module(s)
 > retrieve_data()
 > ```
 
+> [!NOTE]
+> Work in progress. Method should still work as expected.
+
 Check for incomming data
 
 <br>
 
 | <!-- --> | <!-- --> |
 | - | - |
-| **Returns** | `str` if ther is incomming data. `None` otherwise.
-| **Return type** | `0x81` `0x88 ``0x89` or `None`
+| **Returns** | `str` if there is incomming data. `None` otherwise.
+| **Return type** | `0x81` `0x88` `0x89` or `None`
 
 <br>
 
 > [!NOTE]
-> The below methods are used by GCS for testing
+> The below methods are used by GCS for testing.
 
 
 > ```py
@@ -118,8 +121,30 @@ Check for incomming data
 
 Request and retrieve configuration detail of XBee device.
 
+| <!-- --> | <!-- --> |
+| - | - |
+| **Parameters** | **id** (`str`) - Identifier of AT command |
+| **Returns** | AT command response. See [0x88 AT Command Response][at_command_response] for more details. |
+| **Return type** | `0x88`|
+
 
 <!-- Links -->
 [serial_port]: ./serial_port.md
 [frame_details]: ./frame_details.md
 [transmit_status]: ./frame_details.md#xbee-transmit-statusapi-mode---frame-type-89
+[at_command_response]: ./frame_details.md#0x88---at-command-response
+
+> ```py
+> read_config(self, filename)
+> ```
+
+> [!Warning]
+> This method will be completely rewritten.
+
+This method reads a config file and executes AT commands to retrieve configuration data of an XBee module. All returned data is written to a log file.
+
+| <!-- --> | <!-- --> |
+| - | - |
+| **Parameters** | **filename** (`str`) - Filename of AT Commands to execute.
+<!-- | **Returns** | AT command response. See [0x88 AT Command Response][at_command_response] for more details. |
+| **Return type** | `0x88`| -->
