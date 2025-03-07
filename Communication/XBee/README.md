@@ -8,16 +8,26 @@ This library allows for the communication between a computer and a XBee RF modul
 
 ## Getting Started
 Clone the GCS Infrastructure GitHub repository
-```
+```sh
 git clone https://github.com/ngcp-project/gcs-infrastructure
 ```
+
 Install pyserial 3.5
-```
+
+```sh
 pip install pyserial==3.5
 ```
-See the [XBee Serial API][api] page for method details
 
-See the [Examples][examples] page for example implementations
+> [!Note]
+> You may want to create a virtual environment before installing this package. This can be done with the following command.
+> ```py
+> python -m venv <environment_name>
+> ```
+> See python's [venv](https://docs.python.org/3/library/venv.html) docs for more details.
+
+See the [XBee Serial API][api] page for method details.
+
+See the [Examples][examples] page for example implementations of the XBee Serial Library.
 
 
 ## Getting Help

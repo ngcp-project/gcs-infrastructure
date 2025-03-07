@@ -381,7 +381,7 @@ ID | Description
 :--: | --
 00 | Success
 01 | An expected MAC acknowledgment never occurred  
-02 | CCA failure  
+02 | CCA failure  <!-- https://www.digi.com/resources/documentation/Digidocs/90001500/Reference/r_cca_operations.htm?TocPath=Operation%7CClear%20Channel%20Assessment%20(CCA)%7C_____1 -->
 03 | Packet was purged without being transmitted  
 04 | Physical error on the interface with the WiFi transceiver  
 18 | No Buffers  
