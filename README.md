@@ -4,7 +4,7 @@
 <!-- Libraries? Maybe there will be another one made for future iterations of this project :O -->
 
 ### XBee Serial Library
-This library builds off [pySerial](https://pyserial.readthedocs.io/en/latest/pyserial.html) and allows for the easy transmission and reception of data over the XBee module. This library was made specifically for the [Digi XBee® RR Pro Module](xbee_rr_datasheet).
+This library builds off [pySerial](https://pyserial.readthedocs.io/en/latest/pyserial.html) and allows for the easy transmission and reception of data over the XBee module. This library was made specifically for the [Digi XBee® RR Pro Module][xbee_rr_datasheet].
 
 Refer to the [XBee Serial Library][xbee_readme.md] page for further details and documentation.
 

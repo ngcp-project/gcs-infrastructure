@@ -11,6 +11,7 @@ from Logger.Logger import Logger
 PORT = "/dev/cu.usbserial-D30DWZKY"
 # PORT = "/dev/cu.usbserial-D30DWZL4"
 BAUD_RATE = 115200
+CONFIG_FILE = "AT_Command_List.txt"
 
 LOGGER = Logger()
 
@@ -19,7 +20,7 @@ def main():
     print("===============================")
 
     # Initialize XBee object
-    xbee = XBee(port=PORT, baudrate=BAUD_RATE, logger=LOGGER)
+    xbee = XBee(port=PORT, baudrate=BAUD_RATE, logger=LOGGER, config_file=CONFIG_FILE)
         # Open serial connection
     try:
         opened = xbee.open()
@@ -28,7 +29,7 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         # LOGGER.write(f"Error: {e}")
-
+    print("Being to retrieve data:")
     while xbee is not None and xbee.ser is not None:
         try:
             data = xbee.retrieve_data()

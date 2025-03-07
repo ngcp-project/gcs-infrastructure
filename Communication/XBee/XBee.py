@@ -53,6 +53,10 @@ class XBee(Serial):
         
         try:
             self.ser = serial.Serial(self.port, self.baudrate, timeout=0)
+
+            self.ser.reset_input_buffer()
+            self.ser.reset_output_buffer()
+            time.sleep(0.5)
             
             self.logger.write("Serial port opened.")
             if self.config_file is not None:
@@ -279,9 +283,9 @@ class XBee(Serial):
         timeout_start = time.time()
         while time.time() < timeout_start + self.timeout:
             time.sleep(0.001)
-            response = self.retrieve_data()
+            response: x88 = self.retrieve_data()
 
-            if response is not None and response[0] == 0x88:
+            if response is not None and response.frame_type == 0x88:
                 self.logger.write(f"Response: {response}")
                 return response
             
@@ -310,7 +314,7 @@ class XBee(Serial):
         frame_type = frame_data[0]
         source_address = frame_data[1:3]
         rssi = -frame_data[3]
-        option = frame_data[4]
+        options = frame_data[4]
         data = frame_data[5:]
         try:
             decoded_message = data.decode()
@@ -318,7 +322,8 @@ class XBee(Serial):
             print(f"RSSI (Signal Strength : {rssi} dBm)")
             print("Decoded message:", decoded_message)
             #print("RSSI:", rssi)    
-            frame = x81(frame_type, source_address, rssi, option, decoded_message)
+            frame = x81(frame_type, source_address, rssi, options, decoded_message)
+            self.logger.write(f"[Frame Receive: 16-bit Address] Frame Type: {frame.frame_type}, Source Address: {frame.source_address}, RSSI: {frame.rssi}, Options: {frame.options}, Data: {frame_data}")
             return frame
         except UnicodeDecodeError:
             self.logger.write(f"Error decoding payload. RSSI: {rssi}, Decoded message: {decoded_message}")
@@ -342,6 +347,7 @@ class XBee(Serial):
         command_status = frame_data[4]
         command_data = frame_data[5:]
         frame = x88(frame_type, frame_id, at_command, command_status, command_data)
+        self.logger.write(f"[AT Command Response] Frame Type: {frame.frame_type}, Frame ID: {frame.frame_id}, AT Command: {frame.at_command}, Command Status: {frame.status}, Command Data: {frame.data}")
         return frame
 
     def __0x89(self, frame_data) -> x89:
@@ -359,7 +365,7 @@ class XBee(Serial):
         delivery_status = frame_data[2]
         frame: x89 = x89(frame_type, frame_id, delivery_status)
 
-        self.logger.write(f"Transmit status. ID: {frame.frame_id}, Status: {frame.status}")
+        self.logger.write(f"[Transmit status] Frame Type: {frame.frame_type}, Frame ID: {frame.frame_id}, Status: {frame.status}")
         return frame
     
     def read_config(self, filename):
