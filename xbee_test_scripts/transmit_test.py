@@ -4,7 +4,7 @@ sys.path.insert(1, '../')
 
 import threading
 from Logger.Logger import Logger
-from Communication.XBee import XBee
+from Communication.XBee.XBee import XBee
 
 # PORT = "COM5"
 PORT = "/dev/cu.usbserial-D30DWZL4"

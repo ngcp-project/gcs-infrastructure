@@ -3,7 +3,7 @@ sys.path.insert(1, '../')
 # sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
 # print(sys.path)
 
-from Communication.XBee import XBee
+from Communication.XBee.XBee import XBee
 # from Logs.Logger import Logger
 from Logger.Logger import Logger
 
