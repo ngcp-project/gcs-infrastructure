@@ -1,6 +1,12 @@
 # XBee Serial API Usage Guide
 This guide provides examples of how to use the XBee API for **GCS and vehicle communication**.
 
+## Table of Contents
+- [1️⃣ Initializing the XBee Connection](#1️⃣-initializing-the-xbee-connection)
+- [2️⃣ Closing the XBee Connection](#2️⃣-closing-the-xbee-connection)
+- [3️⃣ Sending Data to a Specified XBee Address](#3️⃣-sending-data-to-a-specified-xbee-address)
+- [4️⃣ Receiving Data from Another XBee](#4️⃣-receiving-data-from-another-xbee)
+
 ---
 ## **1️⃣ Initializing the XBee Connection**
 This example shows how to **open an XBee connection** before sending or receiving data.
@@ -42,6 +48,8 @@ if xbee.open():
 else:
     print("[ERROR] Failed to open XBee connection.")
 ```
+[🔼 Back to Table of Contents](#table-of-contents)
+
 
 <br>
 
@@ -82,6 +90,8 @@ if xbee.open():
 else:
     print("[ERROR] Failed to open XBee connection.")
 ```
+[🔼 Back to Table of Contents](#table-of-contents)
+
 
 <br>
 
@@ -134,4 +144,50 @@ if xbee.open():
 else:
     print("[ERROR] Failed to open XBee connection.")
 ```
+[🔼 Back to Table of Contents](#table-of-contents)
+
+<br>
+
+## **4️⃣ Receiving Data from Another XBee**
+This example demonstrates how to **retrieve incoming data packets** from a vehicle using `retrieve_data()`.
+
+### **Methods Used:**
+- `XBee.retrieve_data()`
+
+### **Returns:**
+- A decoded message if data is received successfully.
+- `None` if no data is available.
+
+> **ℹ️ Note:** Ensure that the XBee connection is **open** before attempting to retrieve data.
+
+### **Example:**
+```python
+from Communication.XBee import XBee
+
+# Configuration
+PORT = "/dev/cu.usbserial-D30DWZKY"
+BAUD_RATE = 115200
+
+# Initialize and open XBee connection
+xbee = XBee(port=PORT, baudrate=BAUD_RATE)
+
+if xbee.open():
+    print("[INFO] XBee connection opened. Listening for incoming data...")
+
+    while True:
+        try:
+            received_data = xbee.retrieve_data()
+            
+            if received_data:
+                print(f"[INFO] Received Data: {received_data}")
+        except KeyboardInterrupt:
+            print("\n[INFO] Stopping data reception.")
+            break
+else:
+    print("[ERROR] Failed to open XBee connection.")
+```
+
+[🔼 Back to Table of Contents](#table-of-contents)
+
+
 
