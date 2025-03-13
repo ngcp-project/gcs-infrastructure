@@ -27,7 +27,8 @@ This example shows how to **open an XBee connection** before sending or receivin
 - `True` if the connection opens successfully.
 - `False` if it fails.
 
-> **ℹ️ Note:** `Logger` is not required. It is used for **testing and debugging** in GCS but can be omitted (logger=None).
+> [!Note] 
+> `Logger` is not required. It is used for **testing and debugging** in GCS but can be omitted (logger=None).
 
 ### **Example:**
 ```python
@@ -63,7 +64,8 @@ This example demonstrates how to **properly close the XBee serial connection** w
 - `True` if the serial port is successfully closed.
 - `False` if the port is already closed or an error occurs.
 
-> **ℹ️ Note:** It is good practice to **always close the XBee connection** when it is no longer in use to free up system resources.
+> [!Note]
+> It is good practice to **always close the XBee connection** when it is no longer in use to free up system resources.
 
 ### **Example:**
 ```python
@@ -112,7 +114,8 @@ This example demonstrates how to **send data from GCS to a vehicle (or any XBee 
 - `True` if the transmission is **successful**.
 - `False` if the **serial port is closed** or an error occurs.
 
-> **ℹ️ Note:** This method **does not confirm** whether the message was delivered successfully to the target. You should check the **Transmit Status Frame (`0x89`)** to confirm delivery. This method is still work-in-progress. Once the functionality of receiving a **Transmit Status Frame (`0x89`)**  is implemented, a new example will be added.
+> [!Note] 
+> This method **does not confirm** whether the message was delivered successfully to the target. You should check the **Transmit Status Frame (`0x89`)** to confirm delivery. This method is still work-in-progress. Once the functionality of receiving a **Transmit Status Frame (`0x89`)**  is implemented, a new example will be added.
 
 ### **Example:**
 ```python
@@ -158,7 +161,8 @@ This example demonstrates how to **retrieve incoming data packets** from a vehic
 - A decoded message if data is received successfully.
 - `None` if no data is available.
 
-> **ℹ️ Note:** Ensure that the XBee connection is **open** before attempting to retrieve data.
+> [!Note] 
+> Ensure that the XBee connection is **open** before attempting to retrieve data.
 
 ### **Example:**
 ```python
