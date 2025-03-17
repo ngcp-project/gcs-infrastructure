@@ -139,7 +139,9 @@ class XBee(Serial):
         if self.ser is None:
             raise serial.SerialException("Error: Serial port is not open")
         
+
         # self.__transmitting = True
+        current_frame_id = self.frame_id
         self.logger.write(f"Transmitting data: {data} to {address}")
         encoded_data = self.__encode_data(data, address)
         self.transmit_queue.put(encoded_data)
@@ -358,7 +360,7 @@ class XBee(Serial):
 
         return frame
     
-    def request_at_command_data(self, id, retry = 3):
+    def request_at_command_data(self, id, retry = 3) -> x88:
 
         # Check if a serial port is open
         if self.ser is None:
@@ -405,19 +407,11 @@ class XBee(Serial):
             # Clear queue just in case
             with self.x88_queue.mutex:
                 self.x88_queue.queue.clear()
-            self.request_at_command_data(id, (retry - 1))
+            self.logger.write(f"No response when running At Command {id}. Retries remaining: {retry}")
+            return self.request_at_command_data(id, (retry - 1))
 
-        # self.logger.write("No response")
-        # return None
-
-        # If retrieve status is true
-        # if(retrieveStatus):
-        # self.__receiving = True
-        # return self.retrieve_data()
-        # Return true once data is send to the XBee module over serial.
-        # NOTE: This does not mean that a transmission is successful
-        # else:
-        #     return 
+        self.logger.write(f"No response when running AT Command {id}")
+        return None
 
     def __0x81(self, frame_data) -> x81:
         """Handle XBee Frame Type 81 (Frame Receive: 16-bit Address)
