@@ -1,10 +1,12 @@
+import queue
 import re
 import serial
+import threading
 import time
+
 from Communication.interfaces.Serial import Serial
 from Communication.XBee.Frames import x81, x88, x89
 from Logger.Logger import Logger
-# import multiprocessing
 
 class XBee(Serial):
     # Configure serial port
@@ -31,6 +33,14 @@ class XBee(Serial):
 
         self.config_file = config_file # Add AT_Config.py file
 
+        # Retrieve Queues
+        self.x81_queue: queue.Queue = queue.Queue();
+        self.x88_queue = queue.Queue();
+        self.x89_queue = queue.Queue();
+
+        # Transmit Queue
+
+
         self.__transmitting = False
         self.__receiving = False
 
@@ -45,6 +55,12 @@ class XBee(Serial):
         Raises:
           SerialException if there is an error opening the serial port
         """
+
+        def poll_serial_port():
+            pass
+
+
+
         self.logger.write("Attempting to open serial XBee connection.")
 
         if self.ser is not None:
@@ -120,7 +136,7 @@ class XBee(Serial):
         return False
 
 
-    def retrieve_data(self):
+    def __retrieve_data(self):
         """
         Read incoming data in API mode:
         - Start delimiter (0x7E)
@@ -220,6 +236,45 @@ class XBee(Serial):
             print(f"Got frame type: 0x{frame_type:02X}, ignoring.")
             return None
 
+    def retrieve_data(self):
+        """
+        Retrieves one frame of data (0x81 - Rx Packet)
+
+        Returns:
+        - 0x81: (frame_type, source_address, rssi, options, data)
+        - None: If there is no data.
+        """
+
+        if not self.x81_queue.empty():
+            return self.x81_queue.get()
+        else:
+            return None
+        
+    def __retrieve_at_command(self):
+        """
+        Retrieves one AT response frame (0x88 - Rx Packet)
+
+        Returns:
+        - 0x88: (frame_type, frame_id, at_command, status, data)
+        - None: If there is no data.
+        """
+        if not self.x88_queue.empty():
+            return self.x88_queue.get()
+        else:
+            return None
+        
+    def __retrieve_transmit_status(self):
+        """
+        Retrieves one transmit status frame (0x89 - Tx Status)
+
+        Returns:
+        - 0x89: (frame_type, frame_id, status)
+        - None: If there is no data.
+        """
+        if not self.x89_queue.empty():
+            return self.x89_queue.get()
+        else:
+            return None
     
 
     # NOTE** Might need to check data length
