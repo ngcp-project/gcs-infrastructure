@@ -39,10 +39,10 @@ class XBee(Serial):
         self.x89_queue: queue.Queue = queue.Queue()
 
         # Transmit Queue
-        self.tx_queue: queue.Queue = queue.Queue()
+        self.transmit_queue: queue.Queue = queue.Queue()
 
-        self.__transmitting = False
-        self.__receiving = False
+        # self.__transmitting = False
+        # self.__receiving = False
 
         self.logger.write(f"port: {self.port}, baudrate: {self.baudrate}, timeout: {self.timeout}, config_file: {self.config_file}")
     
@@ -56,8 +56,20 @@ class XBee(Serial):
           SerialException if there is an error opening the serial port
         """
 
-        def poll_serial_port():
-            pass
+        # Add try except blocks?
+        def poll_and_write_serial():
+            while self.ser is not None:
+                # Check if there is a message to transmit
+                if not self.transmit_queue.empty():
+                    data = self.transmit_queue.get()
+                    self.ser.write(data)
+                # Check serial port for incomming data
+                else:
+                    self.__retrieve_data()
+            else:
+                # Normal exit of loop
+                return 0
+            
 
 
 
@@ -69,12 +81,13 @@ class XBee(Serial):
         
         try:
             self.ser = serial.Serial(self.port, self.baudrate, timeout=0)
+            self.logger.write("Serial port opened.")
+            self.logger.write("Clearing input and output buffers.")
 
             self.ser.reset_input_buffer()
             self.ser.reset_output_buffer()
             time.sleep(0.5)
-            
-            self.logger.write("Serial port opened.")
+        
             if self.config_file is not None:
                 self.read_config(self.config_file)
         
@@ -82,6 +95,10 @@ class XBee(Serial):
             self.logger.write((f"Error opening serial port: {e}"))
             # print(f"Error opening serial port: {e}")
             raise serial.SerialException(e)
+        
+        t1 = threading.Thread(target=poll_and_write_serial)
+        t1.start()
+
         return True
 
     def close(self):
@@ -122,16 +139,16 @@ class XBee(Serial):
         if self.ser is None:
             raise serial.SerialException("Error: Serial port is not open")
         
-        self.__transmitting = True
+        # self.__transmitting = True
         self.logger.write(f"Transmitting data: {data} to {address}")
         encoded_data = self.__encode_data(data, address)
-        self.tx_queue.put(encoded_data)
+        self.transmit_queue.put(encoded_data)
         # self.ser.write(self.__encode_data(data, address))
         # self.__transmitting = False
 
         # If retrieve status is true
         if(retrieveStatus):
-            self.__receiving = True
+            # self.__receiving = True
             return self.__retrieve_transmit_status()
         # Return true once data is send to the XBee module over serial.
         
@@ -367,7 +384,7 @@ class XBee(Serial):
         self.logger.write("Sending: " + ''.join('{:02x} '.format(x) for x in frame))
 
         # self.ser.write(frame)
-        self.tx_queue.put(frame)
+        self.transmit_queue.put(frame)
 
         # timeout_start = time.time()
         # while time.time() < timeout_start + self.timeout:
