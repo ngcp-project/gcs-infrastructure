@@ -125,7 +125,7 @@ class XBee(Serial):
         return False
 
 
-    def transmit_data(self, data, address = "0000000000000000", retrieveStatus = False) -> bool:
+    def transmit_data(self, data: str, address: str = "0000000000000000", retrieveStatus: bool = False) -> bool:
         """Transmit data.
         Args:
           data: String data to transmit.
@@ -139,6 +139,9 @@ class XBee(Serial):
         if self.ser is None:
             raise serial.SerialException("Error: Serial port is not open")
         
+        if len(data) >= 100:
+            self.logger.write(f"Error: Data should not exceed 100 bytes. Current size: {len(data)} bytes")
+            raise Exception(f"Error: Data should not exceed 100 bytes. Current size: {len(data)} bytes")
 
         # self.__transmitting = True
         current_frame_id = self.frame_id
