@@ -19,12 +19,12 @@ xbee = XBee(port=PORT, baudrate=BAUD_RATE, logger=Logger(), config_file=CONFIG_F
 counter = 0
 def func():
     global counter
-    xbee.transmit_data("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(counter))
-    # logger.write("Sent AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(counter))
+    data = xbee.transmit_data("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(counter), True)
+    logger.write("Sent AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + str(counter))
     counter += 1
 
     print("Data sent")
-    data = xbee.retrieve_data()
+    # data = xbee.retrieve_data()
     if data:
         print("transmit_test.py -> Retrieved data:", data)
         logger.write(f"transmit_test.py -> Retrieved data: {data}")
