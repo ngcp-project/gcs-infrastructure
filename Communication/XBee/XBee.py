@@ -1,9 +1,9 @@
-import re
-import serial
-import time
-from Communication.interfaces.Serial import Serial
-from Communication.XBee.Frames import x81, x88, x89
-from Logger.Logger import Logger
+import re   # Used to parse AT command lines from the config file
+import serial   # Pyserial, used to cimmunicate over serial ports
+import time     # Used for timeouts, sleep, and measuring performance
+from Communication.interfaces.Serial import Serial  # Custom interface/base class for serial communication
+from Communication.XBee.Frames import x81, x88, x89 # Frame parser for classes for each Xbee frame type
+from Logger.Logger import Logger    # Custom logging class
 # import multiprocessing
 
 class XBee(Serial):
@@ -17,24 +17,25 @@ class XBee(Serial):
           status: Automatically receive status packets after a transmission.
           logger: Logger instance
         """
-        self.port = port
-        self.baudrate = baudrate
-        self.ser = None
-        self.status = status
-        if logger is None:
-            self.logger = Logger()
+        self.port = port    # Serial port to use
+        self.baudrate = baudrate     # Communication speed  
+        self.ser = None      # Will hold the actual Serial object
+        self.status = status     # If True, it will try to read back status frames (0x89)
+        
+        if logger is None:  
+            self.logger = Logger()   # Create logger if not provided
             self.logger.write("LOGGER CREATED By XBee.py")
         else:
             self.logger = logger
-        self.timeout = 0.025 # Allow programmer to configure timeout?
-        self.frame_id = 0x01
+        self.timeout = 0.025 # Allow programmer to configure timeout? # Max time to wait for responses
+        self.frame_id = 0x01    # Frame ID (used to track commands)
 
-        self.config_file = config_file # Add AT_Config.py file
+        self.config_file = config_file # Add AT_Config.py file  # Path to config file with AT commands 
 
-        self.__transmitting = False
-        self.__receiving = False
+        self.__transmitting = False # Flag: are we currently sending?
+        self.__receiving = False    # Flag: are we currently receiving?
 
-        self.logger.write(f"port: {self.port}, baudrate: {self.baudrate}, timeout: {self.timeout}, config_file: {self.config_file}")
+        self.logger.write(f"port: {self.port}, baudrate: {self.baudrate}, timeout: {self.timeout}, config_file: {self.config_file}")    # Log configuration for debugging
     
 
     def open(self):
