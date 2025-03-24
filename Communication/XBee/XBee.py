@@ -53,15 +53,15 @@ class XBee(Serial):
             return False
         
         try:
-            self.ser = serial.Serial(self.port, self.baudrate, timeout=0)
+            self.ser = serial.Serial(self.port, self.baudrate, timeout=0)   # Actually open the serial port
 
-            self.ser.reset_input_buffer()
+            self.ser.reset_input_buffer()   # Clear junk
             self.ser.reset_output_buffer()
             time.sleep(0.5)
             
             self.logger.write("Serial port opened.")
             if self.config_file is not None:
-                self.read_config(self.config_file)
+                self.read_config(self.config_file)   # Optionally apply AT config
         
         except serial.SerialException as e:
             self.logger.write((f"Error opening serial port: {e}"))
@@ -80,11 +80,11 @@ class XBee(Serial):
             self.logger.write("Attempting to close serial XBee connection.")
 
             try:
-                self.ser.close()
+                self.ser.close()    # Close the serial connection
                 
                 self.logger.write("Serial port closed.")
 
-                self.ser = None
+                self.ser = None # Reset to disconnected state 
             except Exception as e:
                 self.logger.write(f"An error occured when closing serial port: {e}")
                 raise Exception(e)
@@ -109,13 +109,13 @@ class XBee(Serial):
         
         self.__transmitting = True
         self.logger.write(f"Transmitting data: {data} to {address}")
-        self.ser.write(self.__encode_data(data, address))
+        self.ser.write(self.__encode_data(data, address))   # Write encoded packet to serial
         self.__transmitting = False
 
         # If retrieve status is true
-        if(retrieveStatus):
+        if(retrieveStatus): # If caller wants TX status...
             self.__receiving = True
-            return self.__retrieve_status()
+            return self.__retrieve_status() # Wait for a 0x89 frame
         # Return true once data is send to the XBee module over serial.
         
         return False
