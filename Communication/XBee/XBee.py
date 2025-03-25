@@ -1,10 +1,12 @@
+import queue
 import re   # Used to parse AT command lines from the config file
 import serial   # Pyserial, used to cimmunicate over serial ports
+import threading
 import time     # Used for timeouts, sleep, and measuring performance
+
 from Communication.interfaces.Serial import Serial  # Custom interface/base class for serial communication
 from Communication.XBee.Frames import x81, x88, x89 # Frame parser for classes for each Xbee frame type
 from Logger.Logger import Logger    # Custom logging class
-# import multiprocessing
 
 class XBee(Serial):
     # Configure serial port
@@ -32,8 +34,16 @@ class XBee(Serial):
 
         self.config_file = config_file # Add AT_Config.py file  # Path to config file with AT commands 
 
-        self.__transmitting = False # Flag: are we currently sending?
-        self.__receiving = False    # Flag: are we currently receiving?
+        # Retrieve Queues
+        self.x81_queue: queue.Queue = queue.Queue()
+        self.x88_queue: queue.Queue = queue.Queue() # If working properly, this queue should never have more than 1 element
+        self.x89_queue: queue.Queue = queue.Queue()
+
+        # Transmit Queue
+        self.transmit_queue: queue.Queue = queue.Queue()
+
+        # self.__transmitting = False # Flag: are we currently sending?
+        # self.__receiving = False    # Flag: are we currently receiving?d1b2fd40841964d904a7927082
 
         self.logger.write(f"port: {self.port}, baudrate: {self.baudrate}, timeout: {self.timeout}, config_file: {self.config_file}")    # Log configuration for debugging
     
@@ -46,6 +56,24 @@ class XBee(Serial):
         Raises:
           SerialException if there is an error opening the serial port
         """
+
+        # Add try except blocks?
+        def poll_and_write_serial():
+            while self.ser is not None:
+                # Check if there is a message to transmit
+                if not self.transmit_queue.empty():
+                    data = self.transmit_queue.get()
+                    self.ser.write(data)
+                # Check serial port for incomming data
+                else:
+                    self.__retrieve_data()
+            else:
+                # Normal exit of loop
+                return 0
+            
+
+
+
         self.logger.write("Attempting to open serial XBee connection.")
 
         if self.ser is not None:
@@ -53,13 +81,14 @@ class XBee(Serial):
             return False
         
         try:
-            self.ser = serial.Serial(self.port, self.baudrate, timeout=0)   # Actually open the serial port
+            self.ser = serial.Serial(self.port, self.baudrate, timeout=0) # Open the serial port
+            self.logger.write("Serial port opened.")
+            self.logger.write("Clearing input and output buffers.")
 
             self.ser.reset_input_buffer()   # Clear junk
             self.ser.reset_output_buffer()
             time.sleep(0.5)
-            
-            self.logger.write("Serial port opened.")
+        
             if self.config_file is not None:
                 self.read_config(self.config_file)   # Optionally apply AT config
         
@@ -67,6 +96,10 @@ class XBee(Serial):
             self.logger.write((f"Error opening serial port: {e}"))
             # print(f"Error opening serial port: {e}")
             raise serial.SerialException(e)
+        
+        t1 = threading.Thread(target=poll_and_write_serial)
+        t1.start()
+
         return True
 
     def close(self):
@@ -93,7 +126,7 @@ class XBee(Serial):
         return False
 
 
-    def transmit_data(self, data, address = "0000000000000000", retrieveStatus = False) -> bool:
+    def transmit_data(self, data: str, address: str = "0000000000000000", retrieveStatus: bool = False) -> x89 | bool:
         """Transmit data.
         Args:
           data: String data to transmit.
@@ -107,21 +140,28 @@ class XBee(Serial):
         if self.ser is None:
             raise serial.SerialException("Error: Serial port is not open")
         
-        self.__transmitting = True
+        if len(data) >= 100:
+            self.logger.write(f"Error: Data should not exceed 100 bytes. Current size: {len(data)} bytes")
+            raise Exception(f"Error: Data should not exceed 100 bytes. Current size: {len(data)} bytes")
+
+        # self.__transmitting = True
+        current_frame_id = self.frame_id
         self.logger.write(f"Transmitting data: {data} to {address}")
-        self.ser.write(self.__encode_data(data, address))   # Write encoded packet to serial
-        self.__transmitting = False
+
+        encoded_data = self.__encode_data(data, address)
+        self.transmit_queue.put(encoded_data) # Append encoded packet to transmit queue
+        # self.ser.write(self.__encode_data(data, address))
+        # self.__transmitting = False
 
         # If retrieve status is true
         if(retrieveStatus): # If caller wants TX status...
-            self.__receiving = True
-            return self.__retrieve_status() # Wait for a 0x89 frame
-        # Return true once data is send to the XBee module over serial.
+            # self.__receiving = True
+            return self.__retrieve_transmit_status() # Wait for a 0x89 fram
         
         return False
 
 
-    def retrieve_data(self):
+    def __retrieve_data(self):
         """
         Read incoming data in API mode:
         - Start delimiter (0x7E)
@@ -130,9 +170,9 @@ class XBee(Serial):
         - 1-byte Checksum
 
         Returns:
-        - 0x81: 
+        - 0x81: (frame_type, source_address, rssi, options, data)
         - 0x88: (frame_type, frame_id, at_command, command_status, command_data)
-        - 0x89: 
+        - 0x89: (frame_type, frame_id, status)
         """
 
         # Check if a serial port is open
@@ -207,20 +247,88 @@ class XBee(Serial):
         #    The first byte of frame_data is the frame_type
         frame_type = frame_data[0]
         if frame_type == 0x81:
-            return self.__0x81(frame_data)
+            self.logger.write("Adding frame to 0x81 (Rx Packet) queue")
+            frame: x81 = self.__0x81(frame_data)
+            self.x81_queue.put(frame)
+            return frame
         
         elif frame_type == 0x88:
-            return self.__0x88(frame_data)
+            self.logger.write("Adding frame to 0x88 (AT Command Response) queue")
+            frame: x88 = self.__0x88(frame_data)
+            self.x88_queue.put(frame)
+            return frame
         
         elif frame_type == 0x89:
-            return self.__0x89(frame_data)
+            self.logger.write("Adding frame to 0x89 (Tx Status) queue")
+            frame: x89 = self.__0x89(frame_data)
+            self.x89_queue.put(frame)
+            return frame
         
         else:
-            # For all other frame types (e.g. 0x89 = TX Status), just ignore or print a debug
+            # For all other frame types, just ignore or print a debug
             self.logger.write(f"Pass. Unhandled frame type: {frame_data}", self.logger.ERROR)
             print(f"Got frame type: 0x{frame_type:02X}, ignoring.")
             return None
 
+    def retrieve_data(self) -> x81:
+        """
+        Retrieves one frame of data (0x81 - Rx Packet)
+
+        Returns:
+        - 0x81: (frame_type, source_address, rssi, options, data)
+        - None: If there is no data.
+        """
+
+        # if not self.x81_queue.empty():
+            # return self.x81_queue.get(True, self.timeout)
+        # else:
+            # return None
+        try:
+            data = self.x81_queue.get(True, self.timeout)
+        except:
+            return None
+        else:
+            return data
+        
+    def __retrieve_at_command_response(self) -> x88:
+        """
+        Retrieves one AT response frame (0x88 - Rx Packet)
+
+        Returns:
+        - 0x88: (frame_type, frame_id, at_command, status, data)
+        - None: If there is no data.
+        """
+        # if not self.x88_queue.empty():
+        #     return self.x88_queue.get()
+        # else:
+        #     return None
+        
+        try:
+            data = self.x88_queue.get(True, self.timeout)
+        except:
+            return None
+        else:
+            return data
+        
+    def __retrieve_transmit_status(self) -> x89:
+        """
+        Retrieves one transmit status frame (0x89 - Tx Status)
+
+        Returns:
+        - 0x89: (frame_type, frame_id, status)
+        - None: If there is no data.
+        """
+        # if not self.x89_queue.empty():
+        #     return self.x89_queue.get()
+        # else:
+        #     return None
+
+        try:
+            data = self.x89_queue.get(True, self.timeout)
+        except:
+            return None
+        else:
+            return data
     
 
     # NOTE** Might need to check data length
@@ -256,7 +364,7 @@ class XBee(Serial):
 
         return frame
     
-    def request_at_command_data(self, id):
+    def request_at_command_data(self, id, retry = 3) -> x88:
 
         # Check if a serial port is open
         if self.ser is None:
@@ -264,14 +372,16 @@ class XBee(Serial):
         
         if id == None:
             return None
+        
+        current_frame_id = self.frame_id
+        self.frame_id = self.frame_id % 0xff + 0x01
 
         frame = bytearray()
         frame.append(0x7E) # Start delimiter (1 byte)
         frame.append(0x00) # Length (2 bytes)
         frame.append(0x04) # Length
         frame.append(0x08) # Frame Type (1 byte)
-        frame.append(self.frame_id) # Frame ID (1 byte)
-        self.frame_id = self.frame_id % 0xff + 0x01
+        frame.append(current_frame_id) # Frame ID (1 byte)
         frame.extend(id.encode('utf-8')) # AT command (2 bytes)
         checksum = 0xFF - (sum(frame[3:]) & 0xFF)
         frame.append(checksum)  # Checksum (1 byte)
@@ -279,28 +389,33 @@ class XBee(Serial):
         print("Sending: " + ''.join('{:02x} '.format(x) for x in frame))
         self.logger.write("Sending: " + ''.join('{:02x} '.format(x) for x in frame))
 
-        self.ser.write(frame)
+        # self.ser.write(frame)
+        self.transmit_queue.put(frame)
 
-        timeout_start = time.time()
-        while time.time() < timeout_start + self.timeout:
-            time.sleep(0.001)
-            response: x88 = self.retrieve_data()
+        # timeout_start = time.time()
+        # while time.time() < timeout_start + self.timeout:
+        #     time.sleep(0.001)
+        #     response: x88 = self.retrieve_data()
 
-            if response is not None and response.frame_type == 0x88:
-                self.logger.write(f"Response: {response}")
-                return response
-            
-        self.logger.write("No response")
+        #     if response is not None and response.frame_type == 0x88:
+        #         self.logger.write(f"Response: {response}")
+        #         return response
+        response: x88 = self.__retrieve_at_command_response()
+        
+        # Correct response received
+        if response is not None and response.frame_id == current_frame_id:
+            return response
+
+        # No response or incorrect response received
+        if ((response is None) or (response is not None and response.frame_id != current_frame_id)) and retry > 0:
+            # Clear queue just in case
+            with self.x88_queue.mutex:
+                self.x88_queue.queue.clear()
+            self.logger.write(f"No response when running At Command {id}. Retries remaining: {retry}")
+            return self.request_at_command_data(id, (retry - 1))
+
+        self.logger.write(f"No response when running AT Command {id}")
         return None
-
-        # If retrieve status is true
-        # if(retrieveStatus):
-        # self.__receiving = True
-        # return self.retrieve_data()
-        # Return true once data is send to the XBee module over serial.
-        # NOTE: This does not mean that a transmission is successful
-        # else:
-        #     return 
 
     def __0x81(self, frame_data) -> x81:
         """Handle XBee Frame Type 81 (Frame Receive: 16-bit Address)
@@ -358,8 +473,7 @@ class XBee(Serial):
           frame_data: Received bytes (between length and checksum fields)
 
         Returns:
-          xxxxDelivery ID & status of transmitted message
-          Returns 0x89 class (frame_type, frame_id, ...)
+          Returns 0x89 class (frame_type, frame_id, delivery_status)
         """
         frame_type = frame_data[0]
         frame_id = frame_data[1]
