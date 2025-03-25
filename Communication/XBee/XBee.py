@@ -1,12 +1,12 @@
 import queue
-import re
-import serial
+import re   # Used to parse AT command lines from the config file
+import serial   # Pyserial, used to cimmunicate over serial ports
 import threading
-import time
+import time     # Used for timeouts, sleep, and measuring performance
 
-from Communication.interfaces.Serial import Serial
-from Communication.XBee.Frames import x81, x88, x89
-from Logger.Logger import Logger
+from Communication.interfaces.Serial import Serial  # Custom interface/base class for serial communication
+from Communication.XBee.Frames import x81, x88, x89 # Frame parser for classes for each Xbee frame type
+from Logger.Logger import Logger    # Custom logging class
 
 class XBee(Serial):
     # Configure serial port
@@ -19,19 +19,20 @@ class XBee(Serial):
           status: Automatically receive status packets after a transmission.
           logger: Logger instance
         """
-        self.port = port
-        self.baudrate = baudrate
-        self.ser = None
-        self.status = status
-        if logger is None:
-            self.logger = Logger()
+        self.port = port    # Serial port to use
+        self.baudrate = baudrate     # Communication speed  
+        self.ser = None      # Will hold the actual Serial object
+        self.status = status     # If True, it will try to read back status frames (0x89)
+        
+        if logger is None:  
+            self.logger = Logger()   # Create logger if not provided
             self.logger.write("LOGGER CREATED By XBee.py")
         else:
             self.logger = logger
-        self.timeout = 0.025 # Allow programmer to configure timeout?
-        self.frame_id = 0x01
+        self.timeout = 0.025 # Allow programmer to configure timeout? # Max time to wait for responses
+        self.frame_id = 0x01    # Frame ID (used to track commands)
 
-        self.config_file = config_file # Add AT_Config.py file
+        self.config_file = config_file # Add AT_Config.py file  # Path to config file with AT commands 
 
         # Retrieve Queues
         self.x81_queue: queue.Queue = queue.Queue()
@@ -41,10 +42,10 @@ class XBee(Serial):
         # Transmit Queue
         self.transmit_queue: queue.Queue = queue.Queue()
 
-        # self.__transmitting = False
-        # self.__receiving = False
+        # self.__transmitting = False # Flag: are we currently sending?
+        # self.__receiving = False    # Flag: are we currently receiving?d1b2fd40841964d904a7927082
 
-        self.logger.write(f"port: {self.port}, baudrate: {self.baudrate}, timeout: {self.timeout}, config_file: {self.config_file}")
+        self.logger.write(f"port: {self.port}, baudrate: {self.baudrate}, timeout: {self.timeout}, config_file: {self.config_file}")    # Log configuration for debugging
     
 
     def open(self):
@@ -80,16 +81,16 @@ class XBee(Serial):
             return False
         
         try:
-            self.ser = serial.Serial(self.port, self.baudrate, timeout=0)
+            self.ser = serial.Serial(self.port, self.baudrate, timeout=0) # Open the serial port
             self.logger.write("Serial port opened.")
             self.logger.write("Clearing input and output buffers.")
 
-            self.ser.reset_input_buffer()
+            self.ser.reset_input_buffer()   # Clear junk
             self.ser.reset_output_buffer()
             time.sleep(0.5)
         
             if self.config_file is not None:
-                self.read_config(self.config_file)
+                self.read_config(self.config_file)   # Optionally apply AT config
         
         except serial.SerialException as e:
             self.logger.write((f"Error opening serial port: {e}"))
@@ -112,11 +113,11 @@ class XBee(Serial):
             self.logger.write("Attempting to close serial XBee connection.")
 
             try:
-                self.ser.close()
+                self.ser.close()    # Close the serial connection
                 
                 self.logger.write("Serial port closed.")
 
-                self.ser = None
+                self.ser = None # Reset to disconnected state 
             except Exception as e:
                 self.logger.write(f"An error occured when closing serial port: {e}")
                 raise Exception(e)
@@ -125,7 +126,7 @@ class XBee(Serial):
         return False
 
 
-    def transmit_data(self, data: str, address: str = "0000000000000000", retrieveStatus: bool = False) -> bool:
+    def transmit_data(self, data: str, address: str = "0000000000000000", retrieveStatus: bool = False) -> x89 | bool:
         """Transmit data.
         Args:
           data: String data to transmit.
@@ -146,16 +147,16 @@ class XBee(Serial):
         # self.__transmitting = True
         current_frame_id = self.frame_id
         self.logger.write(f"Transmitting data: {data} to {address}")
+
         encoded_data = self.__encode_data(data, address)
-        self.transmit_queue.put(encoded_data)
+        self.transmit_queue.put(encoded_data) # Append encoded packet to transmit queue
         # self.ser.write(self.__encode_data(data, address))
         # self.__transmitting = False
 
         # If retrieve status is true
-        if(retrieveStatus):
+        if(retrieveStatus): # If caller wants TX status...
             # self.__receiving = True
-            return self.__retrieve_transmit_status()
-        # Return true once data is send to the XBee module over serial.
+            return self.__retrieve_transmit_status() # Wait for a 0x89 fram
         
         return False
 
