@@ -29,7 +29,7 @@ class XBee(Serial):
             self.logger.write("LOGGER CREATED By XBee.py")
         else:
             self.logger = logger
-        self.timeout = 0.025 # Allow programmer to configure timeout? # Max time to wait for responses
+        self.timeout = 0.05 # Allow programmer to configure timeout? # Max time to wait for responses
         self.frame_id = 0x01    # Frame ID (used to track commands)
 
         self.config_file = config_file # Add AT_Config.py file  # Path to config file with AT commands 
@@ -88,6 +88,9 @@ class XBee(Serial):
             self.ser.reset_input_buffer()   # Clear junk
             self.ser.reset_output_buffer()
             time.sleep(0.5)
+
+            t1 = threading.Thread(target=poll_and_write_serial)
+            t1.start()
         
             if self.config_file is not None:
                 self.read_config(self.config_file)   # Optionally apply AT config
@@ -96,9 +99,6 @@ class XBee(Serial):
             self.logger.write((f"Error opening serial port: {e}"))
             # print(f"Error opening serial port: {e}")
             raise serial.SerialException(e)
-        
-        t1 = threading.Thread(target=poll_and_write_serial)
-        t1.start()
 
         return True
 
