@@ -38,7 +38,6 @@ def listen_keyboard():
         while True:
             global transmit_data, transmit
             transmit_data = input()
-            print("asdf")
             # with transmit_lock:
             transmit = True
     except KeyboardInterrupt:
