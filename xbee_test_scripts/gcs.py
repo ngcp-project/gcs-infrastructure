@@ -39,7 +39,7 @@ COMMANDS = {
 # Initializing XBee GCS
 
 logger = Logger()
-gcs_xbee = XBee(port="", baudrate=115200, logger=logger)
+gcs_xbee = XBee(port="/dev/cu.usbserial-D30DWZKT", baudrate=115200, logger=logger) # !!! set correct port !!!
 gcs_xbee.open()
 
 def listen_for_telemetry():
@@ -71,7 +71,7 @@ def main():
             # for now just wait
             print("\nGCS Commands")
             print("Available Vehicles: ", ", ".join(VEHICLES.keys()))
-            vehicle_name = input("Enter vehicle name (or 'exit' to quit): ").strip().upper()
+            vehicle_name = input("Enter vehicle name (or 'exit' to quit): \n\n").strip().upper()
             
             if vehicle_name == 'EXIT':
                 break
@@ -100,7 +100,12 @@ def main():
                 print("Invalid Input")
                 continue
             
-            payload = bytes([command_id])
+            
+            payload = str(command_id)
+            
+            
+            
+            
             
             print(f"Sending '{COMMANDS[command_id]}' (ID={command_id}) to {vehicle_name} ({vehicle['MAC']})")
             
