@@ -46,9 +46,18 @@ def listen_for_telemetry():
     while True:
         frame: x81 = gcs_xbee.retrieve_data()
         if frame:
-            src_16bit = frame.source_address.hex().upper().zfill(4)
             telemetry = frame.data
-            print(f"[Telemetry] From: {src_16bit}, RSSI: {frame.rssi}, Data: {telemetry}")
+            src_16bit = frame.source_address.hex().upper().zfill(4)
+            #telemetry = frame.data
+            #print(f"[Telemetry] From: {src_16bit}, RSSI: {frame.rssi}, Data: {telemetry}")
+            
+            if telemetry.startswith("ACK:"):
+                print(f"Received ACK from {src_16bit}: {telemetry}")
+            else:
+                log_line = f"[Telemetry] From: {src_16bit}, RSSI: {frame.rssi}, Data: {telemetry}\n"
+                with open("gcs_telemetry_log.txt", "a") as log_file:
+                    log_file.write(log_line)
+            
             
             for name, info in VEHICLES.items():
                 if info["short"] == src_16bit:
