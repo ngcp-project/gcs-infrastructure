@@ -3,7 +3,7 @@ import logging
 import os
 
 class Logger():
-    def __init__(self):
+    def __init__(self, log_to_console=True):
         self.NOTSET = logging.NOTSET
         self.DEBUG = logging.DEBUG
         self.INFO = logging.INFO

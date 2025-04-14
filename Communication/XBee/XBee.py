@@ -217,16 +217,18 @@ class XBee(Serial):
 
 
         # print("Data Between Length & Checksum Fields:")
-        print(" ".join(f"{b:02x}" for b in frame_data))
-        self.logger.write(" ".join(f"{b:02x}" for b in frame_data))
+        # replacing the line bellow with logger.write
+        # print(" ".join(f"{b:02x}" for b in frame_data))
+        self.logger.write("Decoded frame data: "+ " ".join(f"{b:02x}" for b in frame_data))
 
         # 5) Read the 1-byte checksum
         checksum_raw = self.ser.read(1)
         # print("DEBUG: checksum_raw =", checksum_raw)
 
         if len(checksum_raw) < 1:
-            print("DEBUG: No checksum byte read!")
-            self.logger.write(f"Pass. No checksum byte read!", self.logger.WARNING)
+            # replacing print with logger write
+            # print("DEBUG: No checksum byte read!")
+            self.logger.write(f"DEBUG: No checksum byte read!", self.logger.WARNING)
             # Did not get the checksum byte
             return None
 
@@ -234,12 +236,18 @@ class XBee(Serial):
 
         # 6) Calculate & print checksums
         calculated_checksum = 0xFF - (sum(frame_data) & 0xFF)
-        print("Received Checksum:", f"{expected_checksum:02x}")
-        print("Calculated Checksum:", f"{calculated_checksum:02x}")
-
+        # Replace these print() with logger.write
+        #print("Received Checksum:", f"{expected_checksum:02x}")
+        #print("Calculated Checksum:", f"{calculated_checksum:02x}")
+        
+        self.logger.write(f"Received Checksum: {expected_checksum:02x}", self.logger.DEBUG)
+        self.logger.write(f"Calculated Checksum: {calculated_checksum:02x}", self.logger.DEBUG)
+        
         # 7) Compare checksums
         if expected_checksum != calculated_checksum:
-            print("Checksum mismatch - ignoring frame.")
+            # Replacing with logger.write too
+            # print("Checksum mismatch - ignoring frame.")
+            self.logger.write("Checksum mismatch - ignoring frame.", self.logger.WARNING)
             self.logger.write(f"Checksum mismatch - ignoring frame: {frame_data} expected: {expected_checksum} received: {calculated_checksum}", self.logger.WARNING)
             return None
 
@@ -359,7 +367,7 @@ class XBee(Serial):
         frame.append(checksum)  # Checksum (1 byte)
 
         # print(frame)
-        print("Encoded data: " + ''.join('{:02x} '.format(x) for x in frame))
+        # print("Encoded data: " + ''.join('{:02x} '.format(x) for x in frame))
         self.logger.write("Encoded data: " + ''.join('{:02x} '.format(x) for x in frame))
 
         return frame
@@ -435,9 +443,10 @@ class XBee(Serial):
         try:
             decoded_message = data.decode()
             self.logger.write(f"Received payload. RSSI: {rssi}, Decoded message: {decoded_message}")
-            print(f"RSSI (Signal Strength : {rssi} dBm)")
-            print("Decoded message:", decoded_message)
-            #print("RSSI:", rssi)    
+            
+            #print(f"RSSI (Signal Strength : {rssi} dBm)")
+            #print("Decoded message:", decoded_message)
+               
             frame = x81(frame_type, source_address, rssi, options, decoded_message)
             self.logger.write(f"[Frame Receive: 16-bit Address] Frame Type: {frame.frame_type}, Source Address: {frame.source_address}, RSSI: {frame.rssi}, Options: {frame.options}, Data: {frame_data}")
             return frame
