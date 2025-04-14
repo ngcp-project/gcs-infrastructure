@@ -43,7 +43,7 @@ COMMANDS = {
 
 # Initializing XBee GCS
 
-logger = Logger()
+logger = Logger(log_to_console = False)
 gcs_xbee = XBee(port="/dev/cu.usbserial-D30DWZKT", baudrate=115200, logger=logger) # !!! set correct port !!!
 gcs_xbee.open()
 
@@ -58,7 +58,8 @@ def listen_for_telemetry():
             body = payload[1:]          # everything after the tag
 
             if tag == TAG_ACK:
-                print(f"Received ACK from {src_16bit}: {body}")
+                vehicle_name = next((name for name, info in VEHICLES.items() if info["short"] == src_16bit), "UNKNOWN")
+                print(f"Received ACK from {vehicle_name} {src_16bit}: {body}")
             elif tag == TAG_TELEMETRY:
                 log_line = f"[Telemetry] From: {src_16bit}, RSSI: {frame.rssi}, Data: {body}\n"
                 with open("gcs_telemetry_log.txt", "a") as log_file:
