@@ -8,6 +8,11 @@ from Communication.XBee.XBee import XBee
 from Communication.XBee.Frames.x81 import x81
 from Logger.Logger import Logger
 
+# Constants
+TAG_COMMAND = 0x01
+TAG_TELEMETRY = 0x02
+TAG_ACK = 0x03
+
 #Vehicle Setup
 VEHICLE_NAME = "MRA"  # Change this to the current vehicle: "MRA", "MEA", or "ERU"
 GCS_MAC = "0013A200424366C7"  # MAC of the GCS XBee
@@ -20,13 +25,13 @@ vehicle_xbee.open()
 def send_telemetry():
     count = 0
     while True:
-        telemetry = f"{VEHICLE_NAME}::alt={100 + count};bat={90 - count%10}"
-        vehicle_xbee.transmit_data(telemetry, address=GCS_MAC)
-        print(f"Sent telemetry: {telemetry}")
+        payload = chr(TAG_TELEMETRY) + f"{VEHICLE_NAME}::alt={100 + count};bat={90 - count % 10}"
+        vehicle_xbee.transmit_data(payload, address=GCS_MAC)
+        print(f"Sent telemetry: {payload[1:]}")  # Skipping tag when printing
         
         # Log only telemetry (no ACKs)
         with open("vehicle_telemetry_log.txt", "a") as log_file:
-            log_file.write(f"{telemetry}\n")
+            log_file.write(payload[1:]+ "\n")
         
         count += 1
         time.sleep(10)
@@ -36,18 +41,15 @@ def listen_for_commands():
     while True:
         frame: x81 = vehicle_xbee.retrieve_data()
         if frame:
-            try:
-                command_id = frame.data.strip()
-                
-                print(f"Received Command ID: {command_id}")
+            payload = frame.data.encode() if isinstance(frame.data, str) else frame.data
+            tag = payload[0]
+            body = payload[1:].decode()
 
-                # Respond with ACK
-                ack = f"ACK:{command_id}"
-                vehicle_xbee.transmit_data(ack, address=GCS_MAC)
-                print(f"Sent ACK for command {command_id}")
-
-            except Exception as e:
-                print(f"Error parsing command: {e}")
+            if tag == TAG_COMMAND:
+                print(f"Received Command ID: {body}")
+                ack_msg = chr(TAG_ACK) + body
+                vehicle_xbee.transmit_data(ack_msg, address=GCS_MAC)
+                print(f"Sent ACK for command {body}")
         time.sleep(0.05)
 
 

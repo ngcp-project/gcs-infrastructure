@@ -9,6 +9,11 @@ from Logger.Logger import Logger
 import time
 
 
+# Constants
+TAG_COMMAND = 0x01
+TAG_TELEMETRY = 0x02
+TAG_ACK = 0x03
+
 # Defining known vehicles
 
 VEHICLES = {
@@ -43,26 +48,21 @@ gcs_xbee = XBee(port="/dev/cu.usbserial-D30DWZKT", baudrate=115200, logger=logge
 gcs_xbee.open()
 
 def listen_for_telemetry():
-    while True:
+   while True:
         frame: x81 = gcs_xbee.retrieve_data()
         if frame:
-            telemetry = frame.data
+            payload = frame.data  # already a str due to decode in XBee library
             src_16bit = frame.source_address.hex().upper().zfill(4)
-            #telemetry = frame.data
-            #print(f"[Telemetry] From: {src_16bit}, RSSI: {frame.rssi}, Data: {telemetry}")
-            
-            if telemetry.startswith("ACK:"):
-                print(f"Received ACK from {src_16bit}: {telemetry}")
-            else:
-                log_line = f"[Telemetry] From: {src_16bit}, RSSI: {frame.rssi}, Data: {telemetry}\n"
+
+            tag = ord(payload[0])       # convert first character to byte tag
+            body = payload[1:]          # everything after the tag
+
+            if tag == TAG_ACK:
+                print(f"Received ACK from {src_16bit}: {body}")
+            elif tag == TAG_TELEMETRY:
+                log_line = f"[Telemetry] From: {src_16bit}, RSSI: {frame.rssi}, Data: {body}\n"
                 with open("gcs_telemetry_log.txt", "a") as log_file:
                     log_file.write(log_line)
-            
-            
-            for name, info in VEHICLES.items():
-                if info["short"] == src_16bit:
-                    print(f"Telemetry received from {name} ({src_16bit})")
-                    break
         time.sleep(0.05)
         
         
@@ -110,14 +110,8 @@ def main():
                 continue
             
             
-            payload = str(command_id)
-            
-            
-            
-            
-            
-            print(f"Sending '{COMMANDS[command_id]}' (ID={command_id}) to {vehicle_name} ({vehicle['MAC']})")
-            
+            payload = chr(TAG_COMMAND) + str(command_id)
+            print(f"Sending '{COMMANDS[command_id]}' (ID={command_id}) to {vehicle_name}")
             status = gcs_xbee.transmit_data(payload, address=vehicle["MAC"], retrieveStatus=True)
             
             if status:
