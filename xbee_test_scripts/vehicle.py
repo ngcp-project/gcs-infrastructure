@@ -65,7 +65,7 @@ def listen_for_commands():
                     print(f"Sent ACK for command [{cmd_id}] {cmd_name}")
                 except ValueError:
                     print(f"Failed to decode command ID from body: '{body}'")
-        time.sleep(0.05)
+        time.sleep(10)
 
 
 

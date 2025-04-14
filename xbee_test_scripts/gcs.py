@@ -1,5 +1,6 @@
 import sys
 import threading
+from datetime import datetime
 sys.path.append('/Users/olenamolla/Desktop/NGCP/gcs-infrastructure')
 
 from Communication.XBee.XBee import XBee
@@ -61,7 +62,9 @@ def listen_for_telemetry():
                 vehicle_name = next((name for name, info in VEHICLES.items() if info["short"] == src_16bit), "UNKNOWN")
                 print(f"Received ACK from {vehicle_name} {src_16bit}: {body}")
             elif tag == TAG_TELEMETRY:
-                log_line = f"[Telemetry] From: {src_16bit}, RSSI: {frame.rssi}, Data: {body}\n"
+                vehicle_name = next((name for name, info in VEHICLES.items() if info["short"] == src_16bit), "UNKNOWN")
+                timestamp = datetime.now().isoformat(timespec="seconds")
+                log_line = f"{timestamp} | [Telemetry] From: {vehicle_name} ({src_16bit}), RSSI: {frame.rssi}, Data: {body}\n"
                 with open("gcs_telemetry_log.txt", "a") as log_file:
                     log_file.write(log_line)
         time.sleep(0.05)
