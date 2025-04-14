@@ -11,7 +11,10 @@ class Logger():
         self.ERROR = logging.ERROR
         self.CRITICAL = logging.CRITICAL
         
+        self.log_to_console = log_to_console
+        
         f1 = "./Logs/logs.txt"
+        
         # Create Logs directory if it does not exist
         if not os.path.exists(f1):
             os.makedirs(os.path.dirname(f1), exist_ok=True)
@@ -47,7 +50,9 @@ class Logger():
                 logging.critical(data)
             case _:
                 pass
-
+        
+        if self.log_to_console:
+            print(f"[{logging.getLevelName(level)}] {data}")
 
     # def close(self):
         # self.log.close()
