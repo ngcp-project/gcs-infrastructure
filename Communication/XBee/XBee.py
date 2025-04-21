@@ -158,7 +158,7 @@ class XBee(Serial):
             # self.__receiving = True
             return self.__retrieve_transmit_status() # Wait for a 0x89 fram
         
-        return False
+        return None
 
 
     def __retrieve_data(self):
