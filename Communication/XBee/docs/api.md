@@ -77,9 +77,6 @@ Close a connection over the serial port.
 > transmit_data(data, address="0000000000000000")
 > ```
 
-> [!NOTE]
-> Work in progress. Method currently does not return a status.
-
 Send data to another XBee module(s)
 
 <br>
@@ -88,8 +85,14 @@ Send data to another XBee module(s)
 | - | - |
 | **Parameters** | <ul><li>**data** (`str`) -  String data to transmit.</li><li>**address** (`str`) - Address of destination XBee module. `"0000000000000000"` if no value is provided.</li></ul> |
 | **Returns** | Status of transmit request. See [0x89 Tx (Transmit) Status][transmit_status] for more details. |
-| **Return type** | `int` |
+| **Return type** | `x89` `bool` |
 | **Raises** | `SerialException` if serial port is not open | 
+
+*data* can be at most 100 bytes (100 characters)
+
+*address* can be set to `000000000000FFFF` in order to broadcast a message
+
+Returns `false` if no status frame is received
 
 <br>
 
