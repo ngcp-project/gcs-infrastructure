@@ -1,0 +1,10 @@
+[Unit]
+Description=Transmit Test Service
+After=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/Documents/gcs-infrastructure/xbee_test_scripts
+ExecStart=sudo python3 /home/pi/Documents/gcs-infrastructure/xbee_test_scripts/test.py
+KillSignal=SIGINT
+Restart=always
