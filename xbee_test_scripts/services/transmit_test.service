@@ -9,3 +9,6 @@ ExecStart=sudo python3 /home/pi/Documents/gcs-infrastructure/xbee_test_scripts/v
 KillSignal=SIGINT
 Restart=always
 RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
