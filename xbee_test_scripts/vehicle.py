@@ -3,7 +3,7 @@ import threading
 import time
 from datetime import datetime
 
-sys.path.append('/Users/olenamolla/Desktop/NGCP/gcs-infrastructure')
+sys.path.insert(1, '../')
 
 from Communication.XBee.XBee import XBee
 from Communication.XBee.Frames.x81 import x81
@@ -22,11 +22,11 @@ COMMANDS = {
 }
 
 #Vehicle Setup
-VEHICLE_NAME = "MRA"  # Change this to the current vehicle: "MRA", "MEA", or "ERU"
+VEHICLE_NAME = "MEA"  # Change this to the current vehicle: "MRA", "MEA", or "ERU"
 GCS_MAC = "0013A200424366C7"  # MAC of the GCS XBee
 
 logger = Logger(log_to_console = False)
-vehicle_xbee = XBee(port="/dev/cu.usbserial-D30DX9UD", baudrate=115200, logger=logger)  # !!! set correct port !!!
+vehicle_xbee = XBee(port="/dev/ttyUSB0", baudrate=115200, logger=logger)  # !!! set correct port !!!
 vehicle_xbee.open()
 
 # To send telemetry
@@ -43,7 +43,7 @@ def send_telemetry():
             log_file.write(f"[{timestamp}] {payload[1:]}\n")
         
         count += 1
-        time.sleep(0.05)
+        time.sleep(1)
 
 #To receive commands
 def listen_for_commands():
@@ -65,7 +65,7 @@ def listen_for_commands():
                     print(f"Sent ACK for command [{cmd_id}] {cmd_name}")
                 except ValueError:
                     print(f"Failed to decode command ID from body: '{body}'")
-        time.sleep(10)
+        time.sleep(1)
 
 
 

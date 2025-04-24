@@ -107,7 +107,7 @@ This example demonstrates how to **send data from GCS to a vehicle (or any XBee 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `data` | `str` | The message or command to be sent. |
-| `address` | `str` | The 64-bit address of the destination XBee module. Use `"0000000000000000"` for **broadcast**. |
+| `address` | `str` | The 64-bit address of the destination XBee module. Use `"000000000000FFFF"` for **broadcast**. |
 | `retrieveStatus` | `bool` | If `True`, retrieves a transmit status response. |
 
 ### **Returns:**
