@@ -8,3 +8,4 @@ WorkingDirectory=/home/pi/Documents/gcs-infrastructure/xbee_test_scripts
 ExecStart=sudo python3 /home/pi/Documents/gcs-infrastructure/xbee_test_scripts/vehicle.py
 KillSignal=SIGINT
 Restart=always
+RestartSec=5

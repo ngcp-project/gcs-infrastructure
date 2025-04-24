@@ -27,7 +27,12 @@ GCS_MAC = "0013A200424366C7"  # MAC of the GCS XBee
 
 logger = Logger(log_to_console = False)
 vehicle_xbee = XBee(port="/dev/ttyUSB0", baudrate=115200, logger=logger)  # !!! set correct port !!!
-vehicle_xbee.open()
+
+while(vehicle_xbee.ser == None):
+    try:
+        vehicle_xbee.open()
+    except:
+        time.sleep(5)
 
 # To send telemetry
 def send_telemetry():
