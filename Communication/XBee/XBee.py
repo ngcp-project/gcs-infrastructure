@@ -29,7 +29,8 @@ class XBee(Serial):
             self.logger.write("LOGGER CREATED By XBee.py")
         else:
             self.logger = logger
-        self.timeout = 0.05 # Allow programmer to configure timeout? # Max time to wait for responses
+        self.timeout = 0.1 # Allow programmer to configure timeout? # Max time to wait for responses
+        self.status_timeout = 0.2
         self.frame_id = 0x01    # Frame ID (used to track commands)
 
         self.config_file = config_file # Add AT_Config.py file  # Path to config file with AT commands 
@@ -125,7 +126,6 @@ class XBee(Serial):
         self.logger.write("Serial port is already closed.")
         return False
 
-
     def transmit_data(self, data: str, address: str = "0000000000000000", retrieveStatus: bool = False) -> x89 | bool:
         """Transmit data.
         Args:
@@ -156,7 +156,7 @@ class XBee(Serial):
         # If retrieve status is true
         if(retrieveStatus): # If caller wants TX status...
             # self.__receiving = True
-            return self.__retrieve_transmit_status() # Wait for a 0x89 fram
+            return self.__retrieve_transmit_status(current_frame_id) # Wait for a 0x89 frame
         
         return False
 
@@ -287,10 +287,6 @@ class XBee(Serial):
         - None: If there is no data.
         """
 
-        # if not self.x81_queue.empty():
-            # return self.x81_queue.get(True, self.timeout)
-        # else:
-            # return None
         try:
             data = self.x81_queue.get(True, self.timeout)
         except:
@@ -306,10 +302,6 @@ class XBee(Serial):
         - 0x88: (frame_type, frame_id, at_command, status, data)
         - None: If there is no data.
         """
-        # if not self.x88_queue.empty():
-        #     return self.x88_queue.get()
-        # else:
-        #     return None
         
         try:
             data = self.x88_queue.get(True, self.timeout)
@@ -317,8 +309,7 @@ class XBee(Serial):
             return None
         else:
             return data
-        
-    def __retrieve_transmit_status(self) -> x89:
+    def __retrieve_transmit_status(self, frame_id) -> x89:
         """
         Retrieves one transmit status frame (0x89 - Tx Status)
 
@@ -326,13 +317,14 @@ class XBee(Serial):
         - 0x89: (frame_type, frame_id, status)
         - None: If there is no data.
         """
-        # if not self.x89_queue.empty():
-        #     return self.x89_queue.get()
-        # else:
-        #     return None
 
         try:
-            data = self.x89_queue.get(True, self.timeout)
+
+            data: x89 = self.x89_queue.get(True, self.status_timeout)
+            
+            # Not a good solution but it should work.
+            if data.frame_id != frame_id:
+                data: x89 = self.x89_queue.get(True, self.status_timeout)
         except:
             return None
         else:
