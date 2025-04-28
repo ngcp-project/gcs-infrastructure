@@ -1,13 +1,15 @@
 import sys
 import threading
 from datetime import datetime
-sys.path.append('/Users/olenamolla/Desktop/NGCP/gcs-infrastructure')
+sys.path.insert(1, "../")
+# sys.path.append('/Users/olenamolla/Desktop/NGCP/gcs-infrastructure')
 
 from Communication.XBee.XBee import XBee
 from Communication.XBee.Frames.x81 import x81
 from Logger.Logger import Logger
 
 import time
+import asyncio
 
 
 # Constants
@@ -25,7 +27,7 @@ VEHICLES = {
     },
     
     "ERU": {
-        "MAC": "NaN",
+        "MAC": "0013A20042435EA9",
         "short": "0003"
     },
     
@@ -120,6 +122,7 @@ def main():
             
             if status:
                 print("Transmit status received.")
+                print("Frame ID: ", status.frame_id, "Status: ", status.status)
             else:
                 print(f"No transmit status.")
             
