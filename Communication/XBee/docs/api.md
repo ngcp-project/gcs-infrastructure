@@ -77,9 +77,6 @@ Close a connection over the serial port.
 > transmit_data(data, address="0000000000000000")
 > ```
 
-> [!NOTE]
-> Work in progress. Method currently does not return a status.
-
 Send data to another XBee module(s)
 
 <br>
@@ -88,8 +85,16 @@ Send data to another XBee module(s)
 | - | - |
 | **Parameters** | <ul><li>**data** (`str`) -  String data to transmit.</li><li>**address** (`str`) - Address of destination XBee module. `"0000000000000000"` if no value is provided.</li></ul> |
 | **Returns** | Status of transmit request. See [0x89 Tx (Transmit) Status][transmit_status] for more details. |
-| **Return type** | `int` |
+| **Return type** | `x89` or `None` |
 | **Raises** | `SerialException` if serial port is not open | 
+
+*data* can be at most 100 bytes (100 characters)
+
+*address* can be set to `000000000000FFFF` in order to broadcast a message
+
+0x89: (frame_type, frame_id, status)
+
+Returns `None` if no status frame is received
 
 <br>
 
@@ -97,8 +102,6 @@ Send data to another XBee module(s)
 > retrieve_data()
 > ```
 
-> [!NOTE]
-> Work in progress. Method should still work as expected.
 
 Check for incomming data
 
@@ -107,8 +110,10 @@ Check for incomming data
 | <!-- --> | <!-- --> |
 | - | - |
 | **Returns** | `str` if there is incomming data. `None` otherwise.
-| **Return type** | `0x81` `0x88` `0x89` or `None`
-| **Raises** | `SerialException` if serial port is not open | 
+| **Return type** | `0x81` or `None`
+<!-- | **Raises** | `SerialException` if serial port is not open |  -->
+
+0x81: (frame_type, source_address, rssi, options, data)
 
 <br>
 
