@@ -2,3 +2,9 @@ test/
 .DS_Store
 
 __pycache__/
+
+xbee_test_scripts/Logs*
+
+todo.txt
+
+*log.txt
