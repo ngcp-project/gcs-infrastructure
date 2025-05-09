@@ -8,3 +8,6 @@ xbee_test_scripts/Logs*
 todo.txt
 
 *log.txt
+
+venv/
+UGV-Manual-Control/Logs*
