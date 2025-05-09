@@ -8,9 +8,11 @@
 # obligation to maintain or support the software. RTI shall not be liable for
 # any incidental or consequential damages arising out of the use or inability
 # to use the software.
+import struct
 import sys
 sys.path.insert(1, "../")
 
+import threading
 import time
 from inputs import get_gamepad
 from Communication.XBee.XBee import XBee
@@ -26,7 +28,7 @@ UPPER_STEER_CMD_LIMIT = 1.0
 auto_en = False
 linear_vel = 0.0
 steer_val = 0.0
-arm_cmd = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # Ten wide arm commands 
+arm_cmd = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 cmd_vel = 0
 cmd_steer = 0
@@ -74,22 +76,36 @@ def send_manual_control_message():
     
     vehicle = VEHICLES["MRA"]
     
-    # add payload details
-    print("auto_en:", auto_en)
-    print("linear_vel:", linear_vel)
-    print("arm_cmd:", arm_cmd)
-    print("l_bumper:", l_bumper)
-    print("r_bumper:", r_bumper)
-    print("lt_val:", lt_val)
-    print("rt_val:", rt_val)
-    print("ud_dpad:", ud_dpad)
-    print("lr_dpad:", lr_dpad)
-    print("a_btn:", a_btn)
+    if l_bumper == 1 and r_bumper == 1: # Enable Autonomous
+            auto_en = not auto_en
+            #print(f"Autonomous Enable: {auto_en}")
+            # man_obj.auto_en = not man_obj.auto_en # Toggle Autonomous Boolean
+            # auto_obj.auto_en = not auto_obj.auto_en # Toggle Autonomous Boolean
+    if auto_en == True:
+        print("Autonomous Mode Enabled")
+    else:
+        if lt_val > 1000 and rt_val < 1000: # If the left trigger is pressed, send payload arm commands
+            arm_cmd[1] += ud_dpad*2 # Increment arm_cmd[1] by 2
+            if arm_cmd[1] < LOWER_ELBOW_SERV_LIM:
+                arm_cmd[1] = LOWER_ELBOW_SERV_LIM
+            elif arm_cmd[1] > UPPER_ELBOW_SERV_LIM:
+                arm_cmd[1] = UPPER_ELBOW_SERV_LIM
+        elif rt_val > 1000 and lt_val < 1000: # If the right trigger is pressed, send payload arm commands
+            arm_cmd[0] += ud_dpad*2
+            if arm_cmd[0] < -360.0:
+                arm_cmd[0] = -360.0
+            elif arm_cmd[0] > 360.0:
+                arm_cmd[0] = 360.0
+            #print(f"Up/Down Dpad: {ud_dpad}, L/R Dpad: {lr_dpad}")
+        else:
+            linear_vel = cmd_vel
+            steer_val = cmd_steer
+            #print(f"Linear Velocity: {linear_vel}, Steering Angle: {steer_val}")
     
-    payload = chr(TAG_COMMAND) + str(command_id)
+    payload = chr(TAG_COMMAND) + str(command_id) + str([auto_en, linear_vel, steer_val, arm_cmd])
     print(f"Sending '{COMMANDS[command_id]}' (ID={command_id}) to {vehicle_name}")
-    status = gcs_xbee.transmit_data(payload, address=vehicle["MAC"], retrieveStatus=True)
     
+    status = gcs_xbee.transmit_data(payload, address=vehicle["MAC"], retrieveStatus=False)
     if status:
         print("Transmit status received.")
         print("Frame ID: ", status.frame_id, "Status: ", status.status)
@@ -107,17 +123,12 @@ def main():
     
     try:
         print("Starting UGV Manual Control...")
-        time_interval = 0.333
-        marked_time = time.time()
 
         while(True):
-            curr_time = time.time()
             event1 = get_gamepad()
             is_motion = False
             is_valid_input = True
-            
-            print("mark")
-                        
+                                    
             if event1[0].code == "ABS_Y":
                 cmd_vel = event1[0].state/(MAX_JOY_VAL)
                 if -DEAD_ZONE_THRESH <= cmd_vel and cmd_vel <= DEAD_ZONE_THRESH:
@@ -161,16 +172,31 @@ def main():
             # Sends all Button inputs
             if(is_valid_input and not is_motion):
                 send_manual_control_message()
-            # Sends motion inputs over time interval
-            elif(is_motion and curr_time - marked_time >= time_interval):
-                send_manual_control_message()
-                marked_time = curr_time
             
     finally:
         print("Preparing to shut down UGV Manual Control...")
+        gcs_xbee.close()
+
+
+def timed_sender():
+    try:
+        time_interval = 0.5
+        marked_time = time.time()
+        
+        while(True):
+            curr_time = time.time()
+            
+            # Sends motion inputs over time interval
+            if(curr_time - marked_time >= time_interval):
+                send_manual_control_message()
+                marked_time = curr_time
+    except Exception as e:
+        print("Error in timed_sender: ", e)
 
 if __name__ == "__main__":
     try:
+        thread = threading.Thread(target=timed_sender, daemon=True)
+        thread.start()
         main()
     except KeyboardInterrupt:
         print("UGV Manual Control Shut Down")
