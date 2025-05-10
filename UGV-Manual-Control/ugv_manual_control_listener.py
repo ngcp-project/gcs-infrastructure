@@ -29,11 +29,13 @@ logger = Logger(log_to_console = False)
 vehicle_xbee = XBee(port="COM4", baudrate=115200, logger=logger)  # !!! set correct port !!!
 vehicle_xbee.open()
 
+last_sent_time = time.time()
+
 #To receive commands
 def listen_for_commands():
     while True:
         frame: x81 = vehicle_xbee.retrieve_data()
-        if frame or True:
+        if frame:
             payload = frame.data.encode() if isinstance(frame.data, str) else frame.data
             tag = payload[0]
             cmd = payload.decode()[1]
@@ -61,10 +63,17 @@ def listen_for_commands():
                     
                     man_writer.write(man_obj)
                     """
+
+                    last_sent_time = time.time()
                     
                 except ValueError:
                     print(f"Failed to decode command ID from body: '{body}'")
-        time.sleep(1)
+        else:
+            curr_time = time.time()
+            if(curr_time - last_sent_time >= 1):
+                ### TODO: Write Stall/Stop data to UGV SW
+                print("Stopping")
+        time.sleep(0.1)
 
 
 
