@@ -7,7 +7,7 @@ class CommandResponse(CommandInterface):
     COMMAND_ID = 0
 
     @staticmethod
-    def encode_command_response(commandId) -> str:
+    def encode_packet(commandId) -> str: # Maybe pass the packet back
         """Encode data packet
 
         Args:
@@ -20,7 +20,7 @@ class CommandResponse(CommandInterface):
         return encoded_string
 
     @staticmethod
-    def decode_command_response(encoded_string) -> str:
+    def decode_packet(encoded_string) -> str:
         """Decodes data packet
         
         Args:
