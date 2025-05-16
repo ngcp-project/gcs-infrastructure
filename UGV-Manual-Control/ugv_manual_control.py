@@ -58,11 +58,13 @@ COMMANDS = {
 vehicle_name = "MRA"
 command_id = 5
 
-gcs_xbee = XBee(port="COM3", baudrate=115200) # !!! set correct port !!!
-gcs_xbee.open()
+# gcs_xbee = XBee(port="COM3", baudrate=115200) # !!! set correct port !!!
+# gcs_xbee.open()
 
 
 def send_manual_control_message():
+    vehicle = VEHICLES["MRA"]
+    
     global auto_en
     global linear_vel
     global arm_cmd
@@ -71,41 +73,39 @@ def send_manual_control_message():
     global lt_val
     global rt_val
     global ud_dpad
-    global lr_dpad
-    global a_btn
-    
-    vehicle = VEHICLES["MRA"]
-    
-    if l_bumper == 1 and r_bumper == 1: # Enable Autonomous
+
+    ## Need to lat
+    # ch the autonomous mode enable to one state 
+    if l_bumper == 1 and r_bumper == 1: # Enable Autonomous 
             auto_en = not auto_en
-            #print(f"Autonomous Enable: {auto_en}")
+            print(f"Autonomous Enable: {auto_en}")
             # man_obj.auto_en = not man_obj.auto_en # Toggle Autonomous Boolean
             # auto_obj.auto_en = not auto_obj.auto_en # Toggle Autonomous Boolean
     if auto_en == True:
         print("Autonomous Mode Enabled")
     else:
-        if lt_val > 1000 and rt_val < 1000: # If the left trigger is pressed, send payload arm commands
-            arm_cmd[1] += ud_dpad*2 # Increment arm_cmd[1] by 2
+        if lt_val > 1000 and rt_val < 1000: # If the left trigger is pressed, send payload arm commands  
+            arm_cmd[1] += ud_dpad*2 # Increment arm_cmd[1] by 2 
             if arm_cmd[1] < LOWER_ELBOW_SERV_LIM:
-                arm_cmd[1] = LOWER_ELBOW_SERV_LIM
+                arm_cmd[1] = LOWER_ELBOW_SERV_LIM 
             elif arm_cmd[1] > UPPER_ELBOW_SERV_LIM:
                 arm_cmd[1] = UPPER_ELBOW_SERV_LIM
         elif rt_val > 1000 and lt_val < 1000: # If the right trigger is pressed, send payload arm commands
-            arm_cmd[0] += ud_dpad*2
+            arm_cmd[0] += ud_dpad*2 
             if arm_cmd[0] < -360.0:
                 arm_cmd[0] = -360.0
             elif arm_cmd[0] > 360.0:
                 arm_cmd[0] = 360.0
-            #print(f"Up/Down Dpad: {ud_dpad}, L/R Dpad: {lr_dpad}")
+            print(f"Up/Down Dpad: {ud_dpad}, L/R Dpad: {lr_dpad}")
         else:
             linear_vel = cmd_vel
-            steer_val = cmd_steer
-            #print(f"Linear Velocity: {linear_vel}, Steering Angle: {steer_val}")
+            steer_cmd = cmd_steer
+            print(f"Linear Velocity: {linear_vel}, Steering Angle: {steer_cmd}")
     
     payload = chr(TAG_COMMAND) + str(command_id) + str([auto_en, linear_vel, steer_val, arm_cmd])
     print(f"Sending '{COMMANDS[command_id]}' (ID={command_id}) to {vehicle_name}")
     
-    status = gcs_xbee.transmit_data(payload, address=vehicle["MAC"], retrieveStatus=False)
+    status = False # gcs_xbee.transmit_data(payload, address=vehicle["MAC"], retrieveStatus=False)
     if status:
         print("Transmit status received.")
         print("Frame ID: ", status.frame_id, "Status: ", status.status)
@@ -175,7 +175,7 @@ def main():
             
     finally:
         print("Preparing to shut down UGV Manual Control...")
-        gcs_xbee.close()
+        # gcs_xbee.close()
 
 
 def timed_sender():
