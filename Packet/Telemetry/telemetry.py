@@ -1,19 +1,21 @@
 import struct
+from datetime import datetime
 
 class Telemetry:
     """Handles telemetry data encoding and decoding for UAV/UGV communication."""
     
-    def __init__(self, speed, pitch, yaw, roll, altitude, battery_life, last_updated,
-             current_latitude, current_longitude, vehicle_status,
-             patient_status,  # <-- move this up
+    def __init__(self, speed=0, pitch=0, yaw=0, roll=0, altitude=0, battery_life=0, last_updated=0,
+             current_latitude=0, current_longitude=0, vehicle_status=0,
+             patient_status=0,  # <-- move this up
              message_flag=0, message_lat=0.0, message_lon=0.0):
+        self.payloadId = 1 # Payload ID for telemetry data is always 1
         self.speed = speed
         self.pitch = pitch
         self.yaw = yaw
         self.roll = roll
         self.altitude = altitude
         self.battery_life = battery_life
-        self.last_updated = last_updated  # Timestamp (8 bytes)
+        self.last_updated = last_updated
         self.current_latitude = current_latitude
         self.current_longitude = current_longitude
         self.vehicle_status = vehicle_status  # 1 byte (Status flag 0-255)
@@ -25,17 +27,31 @@ class Telemetry:
         self.patient_status = patient_status
 
     def encode(self):
-        """Convert telemetry data into binary format."""
-        
-        # 6 floats, 1 Q, 2 doubles, 1 byte, 1 byte, 2 doubles = total 13 items
-        format_string = "=6fQ2dBB2dB" 
-        return struct.pack(format_string, 
-                           self.speed, self.pitch, self.yaw, self.roll, 
-                           self.altitude, self.battery_life, self.last_updated,
-                           self.current_latitude, self.current_longitude, 
-                           self.vehicle_status,
-                           self.message_flag,  # Indicates whether a message is included
-                           self.message_lat, self.message_lon, self.patient_status)
+        """Encode the current Telemetry instance into binary format."""
+        format_string = "=6fd2dBB2dB"
+        return struct.pack(format_string,
+                        self.speed, self.pitch, self.yaw, self.roll,
+                        self.altitude, self.battery_life, self.last_updated,
+                        self.current_latitude, self.current_longitude,
+                        self.vehicle_status,
+                        self.message_flag,
+                        self.message_lat, self.message_lon, self.patient_status)
+
+    # @staticmethod
+    # def encode(speed=0, pitch=0, yaw=0, roll=0, altitude=0, battery_life=0,
+    #          current_latitude=0, current_longitude=0, vehicle_status=0,
+    #          patient_status=0,  # <-- move this up
+    #          message_flag=0, message_lat=0.0, message_lon=0.0):
+    #     """Convert telemetry data into binary format."""
+    #     format_string = "=6fd2dBB2dB" 
+    #     timestamp = datetime.now().timestamp()
+    #     return struct.pack(format_string, 
+    #                        speed, pitch, yaw, roll, 
+    #                        altitude, battery_life, timestamp,
+    #                        current_latitude, current_longitude, 
+    #                        vehicle_status,
+    #                        message_flag,
+    #                        message_lat, message_lon, patient_status)
 
     @staticmethod
     def decode(binary_data):
@@ -45,7 +61,7 @@ class Telemetry:
             print(f"Invalid telemetry packet size. Expected {expected_size}, got {len(binary_data)}")
             return None
 
-        format_string = "=6fQ2dBB2dB"
+        format_string = "=6fd2dBB2dB"
         unpacked_data = struct.unpack(format_string, binary_data)
 
         return Telemetry(*unpacked_data)

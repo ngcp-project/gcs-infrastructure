@@ -3,8 +3,8 @@ test/
 
 __pycache__/
 
-xbee_test_scripts/Logs*
-
 todo.txt
 
 *log.txt
+
+*/Logs*
