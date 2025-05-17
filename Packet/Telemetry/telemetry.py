@@ -37,22 +37,6 @@ class Telemetry:
                         self.message_flag,
                         self.message_lat, self.message_lon, self.patient_status)
 
-    # @staticmethod
-    # def encode(speed=0, pitch=0, yaw=0, roll=0, altitude=0, battery_life=0,
-    #          current_latitude=0, current_longitude=0, vehicle_status=0,
-    #          patient_status=0,  # <-- move this up
-    #          message_flag=0, message_lat=0.0, message_lon=0.0):
-    #     """Convert telemetry data into binary format."""
-    #     format_string = "=6fd2dBB2dB" 
-    #     timestamp = datetime.now().timestamp()
-    #     return struct.pack(format_string, 
-    #                        speed, pitch, yaw, roll, 
-    #                        altitude, battery_life, timestamp,
-    #                        current_latitude, current_longitude, 
-    #                        vehicle_status,
-    #                        message_flag,
-    #                        message_lat, message_lon, patient_status)
-
     @staticmethod
     def decode(binary_data):
         """Decode binary telemetry data into a Telemetry object."""

@@ -8,3 +8,6 @@ todo.txt
 *log.txt
 
 */Logs*
+
+venv/
+UGV-Manual-Control/Logs*
