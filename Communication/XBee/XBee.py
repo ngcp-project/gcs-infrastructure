@@ -126,7 +126,7 @@ class XBee(Serial):
         self.logger.write("Serial port is already closed.")
         return False
 
-    def transmit_data(self, data: str, address: str = "0000000000000000", retrieveStatus: bool = False) -> x89 | bool:
+    def transmit_data(self, data: str, address: str = "0000000000000000", retrieveStatus: bool = False, isByteString: bool=False) -> x89 | bool:
         """Transmit data.
         Args:
           data: String data to transmit.
@@ -148,8 +148,9 @@ class XBee(Serial):
         current_frame_id = self.frame_id
         self.logger.write(f"Transmitting data: {data} to {address}")
 
-        encoded_data = self.__encode_data(data, address)
+        encoded_data = self.__encode_data(data, address, isByteString)
         self.transmit_queue.put(encoded_data) # Append encoded packet to transmit queue
+        
         # self.ser.write(self.__encode_data(data, address))
         # self.__transmitting = False
 
@@ -332,7 +333,7 @@ class XBee(Serial):
     
 
     # NOTE** Might need to check data length
-    def __encode_data(self, data, address = "0000000000000000"):
+    def __encode_data(self, data, address = "0000000000000000", isByteString: bool = False):
         """Encode String data.
 
         Args: 
@@ -353,7 +354,10 @@ class XBee(Serial):
             frame.append(int(address[2 * i : 2 * i + 2], 16))
 
         frame.append(0x00)  # Options (1 byte)
-        frame.extend(data.encode('utf-8'))  # RF data (0 - 256 bytes)
+        if isByteString:
+            frame.extend(data)
+        else:
+            frame.extend(data.encode('utf-8'))  # RF data (0 - 256 bytes)
         # FF - number of bytes between length & checksum field
         checksum = 0xFF - (sum(frame[3:]) & 0xFF)
         frame.append(checksum)  # Checksum (1 byte)
@@ -434,18 +438,23 @@ class XBee(Serial):
         data = frame_data[5:]
         try:
             decoded_message = data.decode()
-            self.logger.write(f"Received payload. RSSI: {rssi}, Decoded message: {decoded_message}")
+            # self.logger.write(f"Received payload. RSSI: {rssi}, Decoded message: {decoded_message}")
             
             #print(f"RSSI (Signal Strength : {rssi} dBm)")
             #print("Decoded message:", decoded_message)
                
-            frame = x81(frame_type, source_address, rssi, options, decoded_message)
-            self.logger.write(f"[Frame Receive: 16-bit Address] Frame Type: {frame.frame_type}, Source Address: {frame.source_address}, RSSI: {frame.rssi}, Options: {frame.options}, Data: {frame_data}")
-            return frame
-        except UnicodeDecodeError:
-            self.logger.write(f"Error decoding payload. RSSI: {rssi}, Decoded message: {decoded_message}")
-            print("Error decoding payload")
-            return None
+            # frame = x81(frame_type, source_address, rssi, options, decoded_message)
+            # self.logger.write(f"[Frame Receive: 16-bit Address] Frame Type: {frame.frame_type}, Source Address: {frame.source_address}, RSSI: {frame.rssi}, Options: {frame.options}, Data: {frame_data}")
+            # return frame
+        except UnicodeDecodeError: 
+            decoded_message = data
+            # self.logger.write(f"Error decoding payload. RSSI: {rssi}, Decoded message: {decoded_message}")
+            # print("Error decoding payload")
+            # return None
+        self.logger.write(f"Received payload. RSSI: {rssi}, Decoded message: {decoded_message}")
+        frame = x81(frame_type, source_address, rssi, options, decoded_message)
+        self.logger.write(f"[Frame Receive: 16-bit Address] Frame Type: {frame.frame_type}, Source Address: {frame.source_address}, RSSI: {frame.rssi}, Options: {frame.options}, Data: {frame_data}")
+        return frame
         
     def __0x88(self, frame_data) -> x88:
         """Handle XBee Frame Type 88 (AT Command Response)
