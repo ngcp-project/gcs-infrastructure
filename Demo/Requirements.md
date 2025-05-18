@@ -3,19 +3,21 @@
 ## Database
 | Requirement | Description | Derives From |
 | ----------- | ----------- | ------------ |
-| DB-Software-01 | The Database shall send and receive commands from Vehicle Integration in JSON format. | |
-| DB-Software-02 | The Database shall receive telemetry data from Vehicle Integration in JSON format. | |
-| DB-Software-03 | The Database shall follow the data formatting as specified by DB/VI Data Transfer Formatting.
-## Vehicle Integration
+| DB-Software-01 | The Database SHALL send and receive commands from Vehicle Integration in JSON format. | |
+| DB-Software-02 | The Database SHALL receive telemetry data from Vehicle Integration in JSON format. | |
+| DB-Software-03 | The Database SHALL follow the data formatting as specified by DB/VI Data Transfer Formatting.
+
+## Vehicle Integration & Infrastructure
 
 | Requirement | Description | Derives From |
 | ----------- | ----------- | ------------ |
-| VI-Software-01 | Vehicle Integration shall send and receive commands from Database in JSON format. | | |
-| VI-Software-02 | Vehicle Integration shall send telemetry data to   
-
-## Infrastructure
-
-| GCS-Software-01 | 
+| VI-Software-01 | Vehicle Integration SHALL send and receive commands from Database in JSON format. | | |
+| VI-Software-02 | Vehicle Integration/Infrastructure SHALL transmit packetized commands to vehicles.
+| VI-Software-03 | Vehicle Integration SHALL send telemetry data to Database in JSON format. | | |
+| VI-Software-04 | Vehicle Integration/Infrastructure SHALL receive packetized telemetry data from the vehicles. | | |
+| VI-Software-05 | Vehicle Integration/Infrastructure SHALL reformat packetized data to JSON data and JSON data to packetized data. | | | 
+| VI-Software-06 | Communications with Database SHALL follow the data formatting as specified by GCS DB/VI Data Transfer Formatting..
+| VI-Software-07 | Communications with vehicles SHALL follow the data formatting as specified by GCS VI/Infrastructure Data Transfer Formatting. | | |
 
 
 ## GCS DB/VI Data Transfer Formatting.
