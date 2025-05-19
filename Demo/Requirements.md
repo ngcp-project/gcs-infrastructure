@@ -79,42 +79,57 @@
 ## GCS VI/Infrastructure Data Transfer Formatting.
 ### Commands
 #### createMission (VI to Vehicle)
-```
-// TODO
 
-```
+Should this be split up? Mission data might be too big to be sent in one transmission. 
+
+(mission, vehicles, stages, keepin / keep out zones, search area, target coordinate)
+
+| Field        | Type | Num Bytes | End Byte | Byte Range | Notes |
+|--|--|--|--|--|--|
+| payloadId    | int  | 1 | 1 | 0 - 1 | payloadId = 1 |
+| commandId    | int  | 1 | 2 | 1 - 2 | commandId = 1 |
+| data         | int  | 1 | 3 | 2 - 3 | ? |
 
 #### transitionNextStage (VI to Vehicle)
-```
-// TODO
-```
+| Field        | Type | Num Bytes | End Byte | Byte Range | Notes |
+|--|--|--|--|--|--|
+| payloadId    | int  | 1 | 1 | 0 - 1 | payloadId = 1 |
+| commandId    | int  | 1 | 2 | 1 - 2 | commandId = 2
+| data         | int  | 1 | 3 | 2 - 3 |
 #### ~~getCamera~~
 #### ~~getTelemetry~~
 #### setEmergencyStop (VI to Vehicle)
-```
-// TODO
-
-```
+| Field        | Type | Num Bytes | End Byte | Byte Range | Notes |
+|--|--|--|--|--|--|
+| payloadId    | int  | 1 | 1 | 0 - 1 | payloadId = 1 |
+| commandId    | int  | 1 | 2 | 1 - 2 | commandId = 3
+| data         | int  | 1 | 3 | 2 - 3 | 0 = Enable Emergency Stop <br> 1 = Disable Emergency Stop |
 
 #### Command Response (Vehicle to VI)
 
-### Telemetry (Vehicle to VI)
-# Vehicle Telemetry Payload Structure
+| Field        | Type | Num Bytes | End Byte | Byte Range | Notes |
+|--|--|--|--|--|--|
+| payloadId    | int  | 1 | 1 | 0 - 1 | payloadId = 1 |
+| commandId    | int  | 1 | 2 | 1 - 2 | commandId = 0
+<!-- | data         | int  | 1 | 3 | 2 - 3 |  -->
 
-| Field             | Type                   | Num Bytes | End Byte | Byte Range     |
-|------------------|------------------------|-----------|----------|----------------|
-| payloadId        | int                    | 1         | 1        | 0 - 1          |
-| speed (ft/s)     | float                  | 4         | 5        | 1 - 5          |
-| pitch (º)        | float                  | 4         | 9        | 5 - 9          |
-| yaw (º)          | float                  | 4         | 13       | 9 - 13         |
-| roll (º)         | float                  | 4         | 17       | 13 - 17        |
-| altitude (ft)    | float                  | 4         | 21       | 17 - 21        |
-| batteryLife      | float                  | 4         | 25       | 21 - 25        |
-| lastUpdated      | unsigned long long     | 8         | 33       | 25 - 33        |
-| currentPosition  | (double, double)       | 16        | 49       | 33 - 49        |
-| vehicleStatus    | int                    | 1         | 50       | 49 - 50        |
-| patientLocation  | (double, double)       | 16        | 66       | 50 - 66        |
-| packageLocation  | (double, double)       | 16        | 82       | 66 - 82        |
+
+### Telemetry (Vehicle to VI)
+
+| Field            | Type               | Num Bytes | End Byte | Byte Range     | Notes |
+|------------------|---------------------|-----------|----------|----------------|-|
+| payloadId        | int                 | 1         | 1        | 0 - 1          | payloadId = 0
+| speed (ft/s)     | float               | 4         | 5        | 1 - 5          |
+| pitch (º)        | float               | 4         | 9        | 5 - 9          |
+| yaw (º)          | float               | 4         | 13       | 9 - 13         |
+| roll (º)         | float               | 4         | 17       | 13 - 17        |
+| altitude (ft)    | float               | 4         | 21       | 17 - 21        |
+| batteryLife      | float               | 4         | 25       | 21 - 25        |
+| lastUpdated      | double              | 8         | 33       | 25 - 33        |
+| currentPosition  | (double, double)    | 16        | 49       | 33 - 49        |
+| vehicleStatus    | int                 | 1         | 50       | 49 - 50        |
+| patientLocation  | (double, double)    | 16        | 66       | 50 - 66        |
+| packageLocation  | (double, double)    | 16        | 82       | 66 - 82        |
 
 **Total Bytes:** 82
 
@@ -141,7 +156,7 @@ According to the RFP, only the MRA needs to obey geofence boundaries? (MRA-08)
 | V-Software-03 | The vehicle SHALL transmit telemetry data to the GCS. | |
 | V-Software-04 | The vehicle SHALL follow the packet structures defined by the GCS. | |
 
-### V-Software-01
+<!-- ### V-Software-01
 #### createMission
 
 #### transitionNextStage
@@ -150,4 +165,4 @@ According to the RFP, only the MRA needs to obey geofence boundaries? (MRA-08)
 
 ## Telemetry
 
-## Commands
+## Commands -->

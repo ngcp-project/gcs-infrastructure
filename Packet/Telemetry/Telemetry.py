@@ -28,8 +28,8 @@ class Telemetry:
 
     def encode(self):
         """Encode the current Telemetry instance into binary format."""
-        format_string = "=6fd2dBB2dB"
-        return struct.pack(format_string,
+        format_string = "=B6fd2dBB2dB"
+        return struct.pack(format_string, self.payloadId,
                         self.speed, self.pitch, self.yaw, self.roll,
                         self.altitude, self.battery_life, self.last_updated,
                         self.current_latitude, self.current_longitude,
@@ -45,7 +45,7 @@ class Telemetry:
             print(f"Invalid telemetry packet size. Expected {expected_size}, got {len(binary_data)}")
             return None
 
-        format_string = "=6fd2dBB2dB"
+        format_string = "=B6fd2dBB2dB"
         unpacked_data = struct.unpack(format_string, binary_data)
 
         return Telemetry(*unpacked_data)
