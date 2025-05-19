@@ -1,10 +1,9 @@
 import struct
-from datetime import datetime
 
 class Telemetry:
     """Handles telemetry data encoding and decoding for UAV/UGV communication."""
     
-    def __init__(self, speed=0, pitch=0, yaw=0, roll=0, altitude=0, battery_life=0, last_updated=0,
+    def __init__(self, payloadId=1, speed=0, pitch=0, yaw=0, roll=0, altitude=0, battery_life=0, last_updated=0,
              current_latitude=0, current_longitude=0, vehicle_status=0,
              patient_status=0,  # <-- move this up
              message_flag=0, message_lat=0.0, message_lon=0.0):
@@ -40,7 +39,7 @@ class Telemetry:
     @staticmethod
     def decode(binary_data):
         """Decode binary telemetry data into a Telemetry object."""
-        expected_size = 67  # Total size of the telemetry packet (in bytes)
+        expected_size = 68  # Total size of the telemetry packet (in bytes)
         if len(binary_data) != expected_size:
             print(f"Invalid telemetry packet size. Expected {expected_size}, got {len(binary_data)}")
             return None

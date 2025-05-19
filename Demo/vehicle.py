@@ -19,7 +19,7 @@ VEHICLE_NAME = "ERU"  # Change this to the current vehicle: "MRA", "MEA", or "ER
 GCS_MAC = "0013A200424366C7"  # MAC of the GCS XBee
 
 logger = Logger(log_to_console = False)
-vehicle_xbee = XBee(port="/dev/cu.usbserial-D30DX9UD", baudrate=115200, logger=logger)  # !!! set correct port !!!
+vehicle_xbee = XBee(port="/dev/cu.usbserial-D30DWZL4", baudrate=115200, logger=logger)  # !!! set correct port !!!
 vehicle_xbee.open()
 
 def update_telemetry_data(speed=0, pitch=0, yaw=0, roll=0, altitude=0, battery_life=0,

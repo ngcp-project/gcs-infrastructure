@@ -19,6 +19,7 @@ transmit_data = ""
 logger = Logger(log_to_console = True)
 
 def manage_serial(xbee:XBee):
+    logger.write("STARTING TO RETRIEVE DATA")
     try:
         while xbee is not None and xbee.ser is not None:
             data = xbee.retrieve_data()
@@ -29,11 +30,11 @@ def manage_serial(xbee:XBee):
                 print("Data sent")
                 # with transmit_lock:
                 transmit = False
+            logger.write("AASDFASDF: ", getattr(data, "data", "No data received"))
             if data:
-                print("Retrieved data:", data.data)
-                print("Decoding data:")
+                logger.write(f"DATA RECEIVED>>>>>>>>>: {data.data}")
                 decoded_data = Telemetry.decode(data.data)
-                logger.write(decoded_data)
+                logger.write(f"Decoded data: {decoded_data}")
                 print(decoded_data)
             
     except Exception as e:
@@ -60,8 +61,8 @@ def main():
         print(f"Error: {e}")
 
     t2 = threading.Thread(target=listen_keyboard)
-
     t1 = threading.Thread(target=manage_serial, args=(xbee,))
+
     t2.start()
     t1.start()
     t1.join()

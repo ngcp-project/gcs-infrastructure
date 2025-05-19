@@ -58,6 +58,7 @@
   "Roll": float,
   "Altitude": float,
   "BatteryLife": float,
+  "RSSI": int,
   "LastUpdated": double, // epoch time
   "CurrentPosition": {
     "Latitude": double,
@@ -66,10 +67,11 @@
   "VehicleStatus": string,
 //   "MessageInfo": object,
 //   "PatientStatus": string,
+  "PatientStatus": int, // 0 = unsecure, 1 = secure
   "patientLocation": {
     "Latitude": double,
     "Longitude": double
-  }
+  },
   "packageLocation": {
     "Latitude": double,
     "Longitude": double

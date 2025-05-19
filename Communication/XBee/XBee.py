@@ -437,7 +437,10 @@ class XBee(Serial):
         options = frame_data[4]
         data = frame_data[5:]
         try:
-            decoded_message = data.decode()
+            if isinstance(data, str):
+                decoded_message = data
+            else:
+                decoded_message = data.decode()
             # self.logger.write(f"Received payload. RSSI: {rssi}, Decoded message: {decoded_message}")
             
             #print(f"RSSI (Signal Strength : {rssi} dBm)")
