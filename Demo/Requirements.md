@@ -22,14 +22,106 @@
 
 
 ## GCS DB/VI Data Transfer Formatting.
+
 ### Commands
 
-### Telemetry
+#### createMission (DB to VI)
+```json
+// TODO
+{
 
+}
+```
+
+#### transitionNextStage (DB to VI)
+```json
+// TODO
+{
+
+}
+```
+#### ~~getCamera~~
+#### ~~getTelemetry~~
+#### setEmergencyStop (DB to VI)
+```json
+// TODO
+{
+
+}
+```
+### Telemetry (VI to Database)
+```json
+{
+  "Speed": float,
+  "Pitch": float,
+  "Yaw": float,
+  "Roll": float,
+  "Altitude": float,
+  "BatteryLife": float,
+  "LastUpdated": double, // epoch time
+  "CurrentPosition": {
+    "Latitude": double,
+    "Longitude": double
+  },
+  "VehicleStatus": string,
+//   "MessageInfo": object,
+//   "PatientStatus": string,
+  "patientLocation": {
+    "Latitude": double,
+    "Longitude": double
+  }
+  "packageLocation": {
+    "Latitude": double,
+    "Longitude": double
+  }
+}
+```
 ## GCS VI/Infrastructure Data Transfer Formatting.
 ### Commands
+#### createMission (VI to Vehicle)
+```
+// TODO
 
-### Telemetry
+```
+
+#### transitionNextStage (VI to Vehicle)
+```
+// TODO
+```
+#### ~~getCamera~~
+#### ~~getTelemetry~~
+#### setEmergencyStop (VI to Vehicle)
+```
+// TODO
+
+```
+
+#### Command Response (Vehicle to VI)
+
+### Telemetry (Vehicle to VI)
+# Vehicle Telemetry Payload Structure
+
+| Field             | Type                   | Num Bytes | End Byte | Byte Range     |
+|------------------|------------------------|-----------|----------|----------------|
+| payloadId        | int                    | 1         | 1        | 0 - 1          |
+| speed (ft/s)     | float                  | 4         | 5        | 1 - 5          |
+| pitch (º)        | float                  | 4         | 9        | 5 - 9          |
+| yaw (º)          | float                  | 4         | 13       | 9 - 13         |
+| roll (º)         | float                  | 4         | 17       | 13 - 17        |
+| altitude (ft)    | float                  | 4         | 21       | 17 - 21        |
+| batteryLife      | float                  | 4         | 25       | 21 - 25        |
+| lastUpdated      | unsigned long long     | 8         | 33       | 25 - 33        |
+| currentPosition  | (double, double)       | 16        | 49       | 33 - 49        |
+| vehicleStatus    | int                    | 1         | 50       | 49 - 50        |
+| patientLocation  | (double, double)       | 16        | 66       | 50 - 66        |
+| packageLocation  | (double, double)       | 16        | 82       | 66 - 82        |
+
+**Total Bytes:** 82
+
+> [!NOTE]
+> Will be implemeted by `Telemetry.py` (Needs to be updated) <br>
+> Path: `gcs-infrastructure/Packet/Telemetry/Telemetry.py`
+
 
 # Vehicle
 ## Requirements
