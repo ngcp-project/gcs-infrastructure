@@ -126,7 +126,7 @@ class XBee(Serial):
         self.logger.write("Serial port is already closed.")
         return False
 
-    def transmit_data(self, data: str, address: str = "0000000000000000", retrieveStatus: bool = False, isByteString: bool=False) -> x89 | bool:
+    def transmit_data(self, data: str, address: str = "0000000000000000", retrieveStatus: bool = False) -> x89 | bool:
         """Transmit data.
         Args:
           data: String data to transmit.
@@ -148,7 +148,7 @@ class XBee(Serial):
         current_frame_id = self.frame_id
         self.logger.write(f"Transmitting data: {data} to {address}")
 
-        encoded_data = self.__encode_data(data, address, isByteString)
+        encoded_data = self.__encode_data(data, address)
         self.transmit_queue.put(encoded_data) # Append encoded packet to transmit queue
         
         # self.ser.write(self.__encode_data(data, address))
@@ -333,7 +333,7 @@ class XBee(Serial):
     
 
     # NOTE** Might need to check data length
-    def __encode_data(self, data, address = "0000000000000000", isByteString: bool = False):
+    def __encode_data(self, data, address = "0000000000000000"):
         """Encode String data.
 
         Args: 
@@ -354,10 +354,16 @@ class XBee(Serial):
             frame.append(int(address[2 * i : 2 * i + 2], 16))
 
         frame.append(0x00)  # Options (1 byte)
-        if isByteString:
+        if isinstance(data, str):
+            frame.extend(data.encode('utf-8'))
+        elif isinstance(data, (bytes, bytearray)):
             frame.extend(data)
         else:
-            frame.extend(data.encode('utf-8'))  # RF data (0 - 256 bytes)
+            raise TypeError("data must be str, bytes, or bytearray")
+        # else:
+        #     decoded_message = data.decode()
+        # if isByteString:
+        #     frame.extend(data)
         # FF - number of bytes between length & checksum field
         checksum = 0xFF - (sum(frame[3:]) & 0xFF)
         frame.append(checksum)  # Checksum (1 byte)

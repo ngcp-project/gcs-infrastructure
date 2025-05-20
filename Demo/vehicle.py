@@ -117,7 +117,7 @@ def send_telemetry():
         # logger.write(f"payload: {payload}")
         # Convert payload (bytes) to a hex string for transmission
         # logger.write(f"payload bytes: {payload}")
-        vehicle_xbee.transmit_data(telemetry_data, address=GCS_MAC, isByteString=True) # Add bytes parameter to prevent encoding of data that is already bytes.
+        vehicle_xbee.transmit_data(telemetry_data, address=GCS_MAC)
 
         # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
