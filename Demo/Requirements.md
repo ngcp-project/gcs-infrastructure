@@ -98,8 +98,7 @@ Should this be split up? Mission data might be too big to be sent in one transmi
 | payloadId    | int  | 1 | 1 | 0 - 1 | payloadId = 1 |
 | commandId    | int  | 1 | 2 | 1 - 2 | commandId = 2
 | data         | int  | 1 | 3 | 2 - 3 |
-#### ~~getCamera~~
-#### ~~getTelemetry~~
+
 #### setEmergencyStop (VI to Vehicle)
 | Field        | Type | Num Bytes | End Byte | Byte Range | Notes |
 |--|--|--|--|--|--|
@@ -120,7 +119,7 @@ Should this be split up? Mission data might be too big to be sent in one transmi
 
 | Field            | Type               | Num Bytes | End Byte | Byte Range     | Notes |
 |------------------|---------------------|-----------|----------|----------------|-|
-| payloadId        | int                 | 1         | 1        | 0 - 1          | payloadId = 0
+| payloadId        | int                 | 1         | 1        | 0 - 1          | payloadId = 2
 | speed (ft/s)     | float               | 4         | 5        | 1 - 5          |
 | pitch (º)        | float               | 4         | 9        | 5 - 9          |
 | yaw (º)          | float               | 4         | 13       | 9 - 13         |
