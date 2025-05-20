@@ -79,7 +79,7 @@
 }
 ```
 ## GCS VI/Infrastructure Data Transfer Formatting.
-### Commands
+### Commands (0x01)
 #### createMission (VI to Vehicle)
 
 Should this be split up? Mission data might be too big to be sent in one transmission. 
@@ -115,24 +115,36 @@ Should this be split up? Mission data might be too big to be sent in one transmi
 <!-- | data         | int  | 1 | 3 | 2 - 3 |  -->
 
 
-### Telemetry (Vehicle to VI)
+### Telemetry (0x02) (Vehicle to VI)
 
 | Field            | Type               | Num Bytes | End Byte | Byte Range     | Notes |
-|------------------|---------------------|-----------|----------|----------------|-|
-| payloadId        | int                 | 1         | 1        | 0 - 1          | payloadId = 2
-| speed (ft/s)     | float               | 4         | 5        | 1 - 5          |
-| pitch (º)        | float               | 4         | 9        | 5 - 9          |
-| yaw (º)          | float               | 4         | 13       | 9 - 13         |
-| roll (º)         | float               | 4         | 17       | 13 - 17        |
-| altitude (ft)    | float               | 4         | 21       | 17 - 21        |
-| batteryLife      | float               | 4         | 25       | 21 - 25        |
-| lastUpdated      | double              | 8         | 33       | 25 - 33        |
-| currentPosition  | (double, double)    | 16        | 49       | 33 - 49        |
-| vehicleStatus    | int                 | 1         | 50       | 49 - 50        |
-| patientLocation  | (double, double)    | 16        | 66       | 50 - 66        |
-| packageLocation  | (double, double)    | 16        | 82       | 66 - 82        |
+|------------------|--------------------|-----------|----------|----------------|-------|
+| payloadId        | int                | 1         | 1        | 0 - 1          | payloadId = 2
+| speed (ft/s)     | float              | 4         | 5        | 1 - 5          |
+| pitch (º)        | float              | 4         | 9        | 5 - 9          |
+| yaw (º)          | float              | 4         | 13       | 9 - 13         |
+| roll (º)         | float              | 4         | 17       | 13 - 17        |
+| altitude (ft)    | float              | 4         | 21       | 17 - 21        |
+| batteryLife      | float              | 4         | 25       | 21 - 25        |
+| lastUpdated      | double             | 8         | 33       | 25 - 33        |
+| currentPosition  | (double, double)   | 16        | 49       | 33 - 49        |
+| vehicleStatus    | int                | 1         | 50       | 49 - 50        |
+| patientLocation  | (double, double)   | 16        | 66       | 50 - 66        |
+| packageLocation  | (double, double)   | 16        | 82       | 66 - 82        |
 
+### Acknowledgement (0x03) (Vehicle to VI)
+
+| Field        | Type | Num Bytes | End Byte | Byte Range | Notes |
+|--------------|------|-----------|----------|------------|-------|
+| payloadId    | int  | 1         | 1        | 0 - 1      | payloadId = 3 |
+| data         | int  | 1         | 2        | 1 - 2      | frameId of packet it is responding to? |
 **Total Bytes:** 82
+
+### Ping (0x04) (VI to Vehicle)
+
+| Field        | Type | Num Bytes | End Byte | Byte Range | Notes |
+|--------------|------|-----------|----------|------------|-------|
+| payloadId    | int  | 1         | 1        | 0 - 1      | payloadId = 4 |
 
 > [!NOTE]
 > Will be implemeted by `Telemetry.py` (Needs to be updated) <br>
