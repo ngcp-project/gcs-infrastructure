@@ -445,8 +445,10 @@ class XBee(Serial):
         try:
             if isinstance(data, str):
                 decoded_message = data
+            elif isinstance(data, (bytes, bytearray)):
+                decoded_message = data.decode('utf-8')
             else:
-                decoded_message = data.decode()
+                raise TypeError("data must be a str, bytes, or bytearray")
             # self.logger.write(f"Received payload. RSSI: {rssi}, Decoded message: {decoded_message}")
             
             #print(f"RSSI (Signal Strength : {rssi} dBm)")
