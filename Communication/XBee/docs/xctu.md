@@ -11,4 +11,4 @@ This guide provides instructions to test the connection between two XBee RF modu
 1. Plug in XBee modules
 2. Click Add devices and select the XBee module's serial device name
 3. Navigate to the "Consoles" tab on the top right
-4. ...
+4. Attempt to send a packet to another XBee module
