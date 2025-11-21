@@ -1,64 +1,65 @@
 import sys
-import os
-#Get the absolute path to the parent directory
+sys.path.insert(1, '../')
 
-current_dir = os.path.dirname(os.path.abspath(__file__))    #this is what Kayshawn and I changed
-parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
-sys.path.insert(0, parent_dir)
-
-#changed above 3 lines^^
+import threading
+# from  multiprocessing import Process
+# from pynput import keyboard
 
 from Communication.XBee.XBee import XBee
-# from Logs.Logger import Logger
-from Logger.Logger import Logger
 
-# PORT = "COM5"
-#PORT = "/dev/cu.usbserial-D30DWZKY" #comment out
-PORT = "COM7"
-# PORT = "/dev/cu.usbserial-D30DWZL4"
+# PORT = "/dev/cu.usbserial-D30DWZL4" # Replace with your actual serial port. Plug in module and run "ls -l /dev/cu.usb*"
+PORT = "COM9"
 BAUD_RATE = 115200
-CONFIG_FILE = "AT_Command_List.txt"
 
-LOGGER = Logger()
+transmit = False
+transmit_lock = threading.Lock()
+transmit_data = ""
 
-def main():
-    print("XBEE SERIAL RECEIVE TEST")
-    print("===============================")
-
-    # Initialize XBee object
-    xbee = XBee(port=PORT, baudrate=BAUD_RATE, logger=LOGGER, config_file=CONFIG_FILE)
-        # Open serial connection
+def manage_serial(xbee:XBee):
     try:
-        opened = xbee.open()
-        # LOGGER.write("XBee Opened")
-        #cLogger.write(f"Opening XBee connection... {"Success" if opened else "Failed"}")
-
-
-#Where the error starts 11/11/25
-
-    except Exception as e:
-        print(f"Error: {e}")
-        # LOGGER.write(f"Error: {e}")
-    print("Being to retrieve data:")
-    while xbee is not None and xbee.ser is not None:
-        try:
+        while xbee is not None and xbee.ser is not None:
             data = xbee.retrieve_data()
+            global transmit 
+            if transmit == True:
+                print("Sending: %s" % transmit_data)
+                xbee.transmit_data(transmit_data)
+                print("Data sent")
+                # with transmit_lock:
+                transmit = False
             if data:
                 print("Retrieved data:", data)
-                Logger.write() #Logger from logger #previously commented 43 and 44
-                LOGGER.write(f"Retrieved data:" + data[0] + " " + str(data[1]))
-        except Exception as e:
-            print(f"Error: {e}")
-            # LOGGER.write(f"Error: {e}")
-        except KeyboardInterrupt:
-            return
-        finally:                                    #uncommented from 50-54, new errors in file
-             # Close serial connection
-             print("Closing serial connection...") 
-             xbee.close()
-             return
-    xbee.close()
-    # LOGGER.write("XBee connection closed")
-        
+            
+    except Exception as e:
+        print(f"Error: {e}")
+    except KeyboardInterrupt:
+        return
+    
+def listen_keyboard():
+    try:
+        while True:
+            global transmit_data, transmit
+            transmit_data = input()
+            print("asdf")
+            # with transmit_lock:
+            transmit = True
+    except KeyboardInterrupt:
+        return
+
+def main():
+    xbee = XBee(PORT, BAUD_RATE)
+
+    try:
+        xbee.open()
+    except Exception as e:
+        print(f"Error: {e}")
+
+    t2 = threading.Thread(target=listen_keyboard)
+
+    t1 = threading.Thread(target=manage_serial, args=(xbee,))
+    t2.start()
+    t1.start()
+    t1.join()
+    t2.join()
+
 if __name__ == '__main__':
     main()
