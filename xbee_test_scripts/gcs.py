@@ -22,17 +22,20 @@ TAG_ACK = 0x03
 VEHICLES = {
     
     "MRA": {
-        "MAC": "0013A200424353F7",
+        #"MAC": "0013A200424353F7",
+        "MAC": "0013A200424366C7", #this is the mac for end point that I set to all vehicles
         "short": "0002"
     },
     
     "ERU": {
-        "MAC": "0013A20042435EA9",
+        #"MAC": "0013A20042435EA9",
+        "MAC": "0013A200424366C7",
         "short": "0003"
     },
     
     "MEA": {
-        "MAC": "0013A2004243672F",
+        #"MAC": "0013A2004243672F",
+        "MAC": "0013A200424366C7",
         "short": "0004"
     }
 }
@@ -47,7 +50,7 @@ COMMANDS = {
 # Initializing XBee GCS
 
 logger = Logger(log_to_console = False)
-gcs_xbee = XBee(port="/dev/cu.usbserial-D30DWZKT", baudrate=115200, logger=logger) # !!! set correct port !!!
+gcs_xbee = XBee(port="COM7", baudrate=115200, logger=logger) # !!! set correct port !!!
 gcs_xbee.open()
 
 def listen_for_telemetry():

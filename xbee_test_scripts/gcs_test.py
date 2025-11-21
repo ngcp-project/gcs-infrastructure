@@ -7,7 +7,8 @@ import threading
 
 from Communication.XBee.XBee import XBee
 
-PORT = "/dev/cu.usbserial-D30DWZL4" # Replace with your actual serial port. Plug in module and run "ls -l /dev/cu.usb*"
+#PORT = "/dev/cu.usbserial-D30DWZL4" # Replace with your actual serial port. Plug in module and run "ls -l /dev/cu.usb*"
+PORT = "COM7"
 BAUD_RATE = 115200
 
 transmit = False

@@ -1,14 +1,20 @@
 import sys
-sys.path.insert(1, '../')
-# sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
-# print(sys.path)
+import os
+#Get the absolute path to the parent directory
+
+current_dir = os.path.dirname(os.path.abspath(__file__))    #this is what Kayshawn and I changed
+parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
+sys.path.insert(0, parent_dir)
+
+#changed above 3 lines^^
 
 from Communication.XBee.XBee import XBee
 # from Logs.Logger import Logger
 from Logger.Logger import Logger
 
 # PORT = "COM5"
-PORT = "/dev/cu.usbserial-D30DWZKY"
+#PORT = "/dev/cu.usbserial-D30DWZKY" #comment out
+PORT = "COM7"
 # PORT = "/dev/cu.usbserial-D30DWZL4"
 BAUD_RATE = 115200
 CONFIG_FILE = "AT_Command_List.txt"
@@ -25,7 +31,11 @@ def main():
     try:
         opened = xbee.open()
         # LOGGER.write("XBee Opened")
-        # logger.write(f"Opening XBee connection... {"Success" if opened else "Failed"}")
+        #cLogger.write(f"Opening XBee connection... {"Success" if opened else "Failed"}")
+
+
+#Where the error starts 11/11/25
+
     except Exception as e:
         print(f"Error: {e}")
         # LOGGER.write(f"Error: {e}")
@@ -35,18 +45,18 @@ def main():
             data = xbee.retrieve_data()
             if data:
                 print("Retrieved data:", data)
-                # logger.write()
-                # LOGGER.write(f"Retrieved data:" + data[0] + " " + str(data[1]))
+                Logger.write() #Logger from logger #previously commented 43 and 44
+                LOGGER.write(f"Retrieved data:" + data[0] + " " + str(data[1]))
         except Exception as e:
             print(f"Error: {e}")
             # LOGGER.write(f"Error: {e}")
         except KeyboardInterrupt:
             return
-        # finally:
-        #     # Close serial connection
-        #     print("Closing serial connection...")
-        #     xbee.close()
-        #     return
+        finally:                                    #uncommented from 50-54, new errors in file
+             # Close serial connection
+             print("Closing serial connection...") 
+             xbee.close()
+             return
     xbee.close()
     # LOGGER.write("XBee connection closed")
         

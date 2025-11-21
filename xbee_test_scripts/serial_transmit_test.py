@@ -1,14 +1,19 @@
 import sys
-sys.path.insert(1, '../')
-# sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
+import os
+#Get the absolute path to the parent directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
+sys.path.insert(0, parent_dir)
+
 
 from Communication.XBee.XBee import XBee
 
 # PORT = "COM5"
-PORT = "/dev/cu.usbserial-D30DWZKY"
+#PORT = "/dev/cu.usbserial-D30DWZKY" #CV: commented out and changed port to com7
+PORT = "COM9"
 # PORT = "/dev/cu.usbserial-D30DWZL4"
 BAUD_RATE = 115200
-DESTINATION = "0013A20042435EA9"
+DESTINATION = "0013A200424366C7" #CV: transmitting to COM7
 # 00 13 A2 00 42 43 5E A9
 def main():
     print("XBEE SERIAL TRANSMIT TEST")
@@ -26,7 +31,7 @@ def main():
             data_to_send = input()
             print("Sending: %s" % data_to_send)
 
-            xbee.transmit_data(data_to_send, DESTINATION)
+            xbee.transmit_data(data_to_send, DESTINATION)   #up to here is fine I believe
             print("Data sent")
             data = xbee.retrieve_data()
             if data:
@@ -36,11 +41,11 @@ def main():
             print(f"Error: {e}")
         except KeyboardInterrupt:
             return
-        # finally:
-        #     # Close serial connection
-        #     print("Closing serial connection...")
-        #     xbee.close()
-        #     return
+         #finally: 
+             # Close serial connection
+             #print("Closing serial connection...")
+             #xbee.close()
+             #return
 
     # Transmit data
     # xbee.transmit_data("Hello, world!")
