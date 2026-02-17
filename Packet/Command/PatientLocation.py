@@ -55,7 +55,7 @@ class PatientLocation(CommandInterface):
         
         unpacked_data = struct.unpack(decode_byte_struct, encoded_string)
 
-        # we are ignoring the "=BB" part here
+        # we are ignoring the "=BB" part here which is the header, "unpacked_data" would look like [1, 5, <some double value>, <some double value>]
         x, y = unpacked_data[2], unpacked_data[3]
         
         if format == "json":
