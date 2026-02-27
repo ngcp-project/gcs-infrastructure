@@ -4,11 +4,11 @@ sys.path.insert(1, '../')
 
 from Communication.XBee.XBee import XBee
 
-# PORT = "COM5"
-PORT = "/dev/cu.usbserial-D30DWZKY"
+PORT = "COM4"
+#PORT = "/dev/cu.usbserial-D30DWZKY"
 # PORT = "/dev/cu.usbserial-D30DWZL4"
 BAUD_RATE = 115200
-DESTINATION = "0013A20042435EA9"
+DESTINATION = "0013A200428396C0"
 # 00 13 A2 00 42 43 5E A9
 def main():
     print("XBEE SERIAL TRANSMIT TEST")
