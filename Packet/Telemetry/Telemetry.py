@@ -41,7 +41,7 @@ class Telemetry:
     @staticmethod
     def decode(binary_data):
         """Decode binary telemetry data into a Telemetry object."""
-        expected_size = 69  # Total size of the telemetry packet (in bytes)
+        expected_size = 72  # Total size of the telemetry packet (in bytes)
         if len(binary_data) != expected_size:
             print(f"Invalid telemetry packet size. Expected {expected_size}, got {len(binary_data)}")
             return None
