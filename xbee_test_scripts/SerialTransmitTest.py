@@ -2,7 +2,7 @@ import sys
 sys.path.insert(1, '../')
 # sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
 
-from Communication.XBee.XBee import XBee
+from digi.xbee.devices import *
 
 PORT = "COM4"
 #PORT = "/dev/cu.usbserial-D30DWZKY"
@@ -13,26 +13,31 @@ DESTINATION = "0013A200428396C0"
 def main():
     print("XBEE SERIAL TRANSMIT TEST")
     print("===============================")
-    
+
     # Initialize XBee object
-    xbee = XBee(PORT, BAUD_RATE)
+    LocalXBee = XBeeDevice(PORT, BAUD_RATE)
+
+    RemoteXBee = RemoteXBeeDevice(LocalXBee, XBee64BitAddress.from_hex_string(DESTINATION))
 
         # Open serial connection
     try:
-        xbee.open()
+        LocalXBee.open()
     except Exception as e:
         print(f"Error: {e}")
 
-    while xbee is not None and xbee.ser is not None:
+    while LocalXBee is not None:
         try:
-            data_to_send = input()
-            print("Sending: %s" % data_to_send)
+            OutgoingData = input()
+            print("Sending: %s" % OutgoingData)
 
-            xbee.transmit_data(data_to_send, DESTINATION)
+            LocalXBee.send_data(RemoteXBee, OutgoingData)
             print("Data sent")
-            data = xbee.retrieve_data()
-            if data:
-                print("Retrieved data:", data)
+
+            XBeeMessage = LocalXBee.read_data()
+            if XBeeMessage:
+                Data = XBeeMessage.data.decode("utf-8")
+
+                print("Retrieved data:", Data)
         
         except Exception as e:
             print(f"Error: {e}")
@@ -49,7 +54,7 @@ def main():
     # Receive data
     # print(xbee.receive_data())
     # Close serial connection
-    xbee.close()
+    LocalXBee.close()
 
 if __name__ == '__main__':
     main()
