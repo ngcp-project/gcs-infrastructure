@@ -5,7 +5,8 @@ class Telemetry:
     
     def __init__(self, payloadId=2, speed=0, pitch=0, yaw=0, roll=0, altitude=0, battery_life=0, last_updated=0,
              current_latitude=0, current_longitude=0, vehicle_status=0,
-             message_flag=0, message_lat=0.0, message_lon=0.0, patient_status=0):
+             message_flag=0, message_lat=0.0, message_lon=0.0, patient_status=0,
+             command_acknowledgement=0):
         self.payloadId = 2 # Payload ID for telemetry data is always 2
         self.speed = speed
         self.pitch = pitch
@@ -23,6 +24,7 @@ class Telemetry:
         self.message_lat = message_lat
         self.message_lon = message_lon
         self.patient_status = patient_status
+        self.command_acknowledgement = command_acknowledgement; #ID of the last command recieved
 
     def encode(self):
         """Encode the current Telemetry instance into binary format."""
@@ -33,12 +35,13 @@ class Telemetry:
                         self.current_latitude, self.current_longitude,
                         self.vehicle_status,
                         self.message_flag,
-                        self.message_lat, self.message_lon, self.patient_status)
+                        self.message_lat, self.message_lon, self.patient_status,
+                        self.command_acknowledgement)
 
     @staticmethod
     def decode(binary_data):
         """Decode binary telemetry data into a Telemetry object."""
-        expected_size = 68  # Total size of the telemetry packet (in bytes)
+        expected_size = 72  # Total size of the telemetry packet (in bytes)
         if len(binary_data) != expected_size:
             print(f"Invalid telemetry packet size. Expected {expected_size}, got {len(binary_data)}")
             return None
@@ -55,4 +58,5 @@ class Telemetry:
             f"Vehicle Status={self.vehicle_status}, "
             f"Message Flag={self.message_flag}, "
             f"Message Location=({self.message_lat}, {self.message_lon}), "
-            f"Patient Status = {self.patient_status}")
+            f"Patient Status={self.patient_status}"
+            f"Last Command ID={self.command_acknowledgement}")
