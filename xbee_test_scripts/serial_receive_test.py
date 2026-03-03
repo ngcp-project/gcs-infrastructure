@@ -2,12 +2,13 @@ import sys
 import threading
 import time
 sys.path.insert(1, '../')
+
 # sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
 # print(sys.path)
 
-from Communication.XBee.XBee import XBee
+from xbee import XBee
 # from Logs.Logger import Logger
-from Logger.Logger import Logger
+from logger import Logger
 
 PORT = "COM3"
 #PORT = "/dev/cu.usbserial-D30DWZKY"
@@ -75,7 +76,7 @@ def ListenForData(xbee: XBee, StopEvent: threading.Event):
         try:
             data = xbee.retrieve_data()
             if data:
-                print("Retrieved data:", data)
+                print("Retrieved data:", data.received_data.decode("utf-8"))
                 # logger.write()
                 # LOGGER.write(f"Retrieved data:" + data[0] + " " + str(data[1]))
         except Exception as e:

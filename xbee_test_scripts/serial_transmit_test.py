@@ -2,7 +2,9 @@ import sys
 sys.path.insert(1, '../')
 # sys.path.append('C:/Users/alber/OneDrive/Рабочий стол/Olena/gcs-infrastructure')
 
-from Communication.XBee.XBee import XBee
+from xbee import XBee
+#from Telemetry.Telemetry import Telemetry
+#from Command.Heartbeat import Heartbeat
 
 PORT = "COM4"
 #PORT = "/dev/cu.usbserial-D30DWZKY"
@@ -25,10 +27,18 @@ def main():
 
     while xbee is not None and xbee.ser is not None:
         try:
+            print("")
             data_to_send = input()
+
+            data = Telemetry.Telemetry()
+
+            telemObj = data.encode()
+
+            data_to_send = telemObj
             print("Sending: %s" % data_to_send)
 
             xbee.transmit_data(data_to_send, DESTINATION)
+            #xbee.transmit_data(data_to_send, DESTINATION)
             print("Data sent")
             data = xbee.retrieve_data()
             if data:
