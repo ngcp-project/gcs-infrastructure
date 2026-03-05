@@ -30,11 +30,6 @@ def main():
             print("")
             data_to_send = input()
 
-            data = Telemetry.Telemetry()
-
-            telemObj = data.encode()
-
-            data_to_send = telemObj
             print("Sending: %s" % data_to_send)
 
             xbee.transmit_data(data_to_send, DESTINATION)
