@@ -24,13 +24,15 @@ Run CommandTransmitTest.py in one window and TelemetryTransmitTest.py in another
 
 Serves as a demo gcs able to send commands and receive telemetry from a vehicle
 
-Commands can be sent either by name or using their Command ID as an alias. Command names are case and whitespace insensitive
+Commands can be sent either by name or using their Command ID as an alias. Command names are case and whitespace insensitive. Send only the command name or alias, the parameters will be entered seperately
 
 | Command Name | Command ID | Parameters |
 | --- | --- | --- |
 | Heartbeat | 1 | ConnectionStatus |
 | Emergency Stop | 2 | int |
 | Keep In | 3 | tuple(x, y) |
+
+Any other string will be sent as a string literal
 
 ### TelemetryTransmitTest.py
 
