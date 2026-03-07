@@ -1,8 +1,10 @@
-from Command.Heartbeat import Heartbeat
 from Command.EmergencyStop import EmergencyStop
+from Command.Heartbeat import Heartbeat
+from Command.KeepIn import KeepIn
 from Enum.ConnectionStatus import ConnectionStatus
 from Telemetry.Telemetry import Telemetry
 
+import ast
 import sys
 import threading
 sys.path.insert(1, '../')
@@ -76,10 +78,12 @@ def main():
         xbee.close()
 
 def ProcessCommand(Command: str):
-    if ((Command.upper() == "HEARTBEAT") or (Command == "1")):
+    if ((Command.replace(" ", "").upper() == "HEARTBEAT") or (Command == "1")):
         return HeartbeatCommand()
-    elif ((Command.upper() == "EMERGENCY STOP") or (Command == "2")):
+    elif ((Command.replace(" ", "").upper() == "EMERGENCYSTOP") or (Command == "2")):
         return EmergencyStopCommand()
+    elif ((Command.replace(" ", "").upper() == "KEEPIN") or (Command == "3")):
+        return KeepInCommand()
     
     return None
 
@@ -96,6 +100,34 @@ def HeartbeatCommand():
         elif ((Input.upper() == "DISCONNECTED") or (Input == "2")):
             return Heartbeat(ConnectionStatus.Disconnected)
 
+def KeepInCommand():
+    print("Keep In Command\nEnter up to 6 coordinates:")
+
+    Coordinates = []
+    CoordinateCount = 1
+
+    while True:
+        print(f"Enter Coordinate {CoordinateCount} as (x, y), or q to end:")
+
+        Input = input()
+
+        try:
+            if (CoordinateCount <= 6):
+                if (Input.upper() == "Q"):
+                    return KeepIn(Coordinates)
+
+                Coordinate = ast.literal_eval(Input)
+
+                print(Coordinate)
+
+                Coordinates.append(Coordinate)
+
+                CoordinateCount += 1
+            else:
+                return KeepIn(Coordinates)
+        except Exception:
+            print("Invalid tuple")
+        
 def EmergencyStopCommand():
     print("Emergency Stop Command\nEnter Stop Status:")
 

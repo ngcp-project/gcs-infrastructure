@@ -1,5 +1,6 @@
-from Command.Heartbeat import Heartbeat
 from Command.EmergencyStop import EmergencyStop
+from Command.Heartbeat import Heartbeat
+from Command.KeepIn import KeepIn
 from Telemetry.Telemetry import Telemetry
 from Enum.ConnectionStatus import ConnectionStatus
 
@@ -83,6 +84,8 @@ def ListenForData(xbee: XBee, StopEvent: threading.Event):
                         Command = Heartbeat.decode_packet(data.received_data)
                     case 2:
                         Command = EmergencyStop.decode_packet(data.received_data)
+                    case 3:
+                        Command = KeepIn.decode_packet(data.received_data)
                     case _:
                         print("\nRetrieved data:", data.received_data.decode("utf-8"))
 
