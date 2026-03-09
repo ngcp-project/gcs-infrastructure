@@ -7,12 +7,16 @@ name = "gcs-infrastructure"
 version = "0.1.0"
 description = "GCS Infrastructure Interface and Tests"
 requires-python = ">=3.8"
+
 authors = [
     { name = "Aidan Sanders" },
     { name = "Joshua Ho" }
 ]
+
 dependencies = [
-  "python-dotenv==1.2.1"
+  "python-dotenv==1.2.1",
+  "xbee-python @ lib/xbee-python",
+  "gcs-packet @ lib/gcs-packet"
 ]
 
 [tool.setuptools.packages.find]
