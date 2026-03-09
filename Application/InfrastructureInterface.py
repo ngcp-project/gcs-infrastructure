@@ -10,12 +10,28 @@ import threading
 
 from xbee import XBee
 
-#PORT = "COM4"
+PORT = "COM4"
 BAUD_RATE = 115200
 DESTINATION = "0013A200428396C0"
 
 CommandQueue = Queue(maxsize = 0)
 TelemetryQueue = Queue(maxsize = 0)
 
+def LaunchXBee(PORT: str):
+    StartXBee(PORT, CommandQueue, TelemetryQueue)
+
 def SendCommand(Command: CommandInterface):
-    pass
+    CommandQueue.put(Command)
+
+    print("Command Queued")
+
+def ReceiveTelemetry():
+    TelemetryInstance = TelemetryQueue.get()
+
+    TelemetryQueue.task_done()
+
+    print("Telemetry Received")
+
+    print(TelemetryInstance)
+
+    return TelemetryInstance

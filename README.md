@@ -4,7 +4,7 @@
 
 1.) Create and source a venv
 
-2.) In /gcs-infrastructure ```cd lib```
+2.) Change working directory to  ```gcs-infrastructure/lib```
 
 3.) ```git submodule update --init --recursive```
 
@@ -13,6 +13,56 @@
 5.) ```pip install -e "lib/xbee-python"```
 
 6.) ```pip install -e lib/gcs-packet"```
+
+> [!NOTE]
+> If using VS Code, open the command palette and ensure the python interpreter is set to your venv, or ```xbee-python``` and ```gcs-packet``` classes will not be found
+
+## Interface
+
+To use ```gcs-infrastructure``` as a submodule:
+
+1.) ```git submodule add https://github.com/ngcp-project/gcs-infrastructure```
+
+2.) ```git submodule update --init --recursive```
+
+3.) ```pip install -e "gcs-infrastructure"```
+
+To start the GCS XBee:
+
+```python
+from InfrastructureInterface import LaunchXBee
+
+LaunchXBee(PORT)
+```
+
+> [!NOTE]
+> Never call LaunchXBee more than once. In the future calling it more than once will return a clearer error
+
+To send a Command
+
+```python
+from InfrastructureInterface import SendCommand
+
+#Assuming LaunchXBee was called earlier, Command is any Command object
+
+SendCommand(Command)
+
+```
+
+To receive Telemetry
+
+```python
+from InfrastructureInterface import ReceiveTelemetry
+
+#Assuming LaunchXBee was called earlier
+
+TelemetryInstance = ReceiveTelemetry()
+```
+
+>[!NOTE]
+> ```SendCommand``` and ```ReceiveTelemetry``` are blocking for the duration of time it takes to add to or remove from the queue. This may be made optional later
+
+
 
 ## Example Scripts
 

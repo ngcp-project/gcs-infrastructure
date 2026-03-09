@@ -1,11 +1,6 @@
-from Command.CommandInterface import CommandInterface
-from Command.EmergencyStop import EmergencyStop
-from Command.Heartbeat import Heartbeat
-from Command.KeepIn import KeepIn
-from Enum.ConnectionStatus import ConnectionStatus
+from Command import *
 from Telemetry.Telemetry import Telemetry
 
-import ast
 import queue
 import threading
 
@@ -15,10 +10,7 @@ from xbee import XBee
 BAUD_RATE = 115200
 DESTINATION = "0013A200428396C0"
 # 00 13 A2 00 42 43 5E A9
-def STARTXBee(PORT: str, CommandQueue: queue.Queue, TelemetryQueue: queue.Queue):
-    print("XBEE SERIAL TRANSMIT TEST")
-    print("===============================")
-    
+def StartXBee(PORT: str, CommandQueue: queue.Queue, TelemetryQueue: queue.Queue):
     # Initialize XBee object
     xbee = XBee(PORT, BAUD_RATE)
 
@@ -31,10 +23,10 @@ def STARTXBee(PORT: str, CommandQueue: queue.Queue, TelemetryQueue: queue.Queue)
     CommandStopEvent = threading.Event()
     TelemetryStopEvent = threading.Event()
 
-    CommandThread = threading.Thread(target = RunCommandThread, args = (xbee, CommandStopEvent))
+    CommandThread = threading.Thread(target = RunCommandThread, args = (xbee, CommandQueue, CommandStopEvent))
     CommandThread.start()
 
-    TelemetryThread = threading.Thread(target = RunTelemetryThread, args = (xbee, TelemetryStopEvent))
+    TelemetryThread = threading.Thread(target = RunTelemetryThread, args = (xbee, TelemetryQueue, TelemetryStopEvent))
     TelemetryThread.start()
 
 def RunCommandThread(xbee: XBee, CommandQueue: queue.Queue, CommandStopEvent: threading.Event):
@@ -43,7 +35,9 @@ def RunCommandThread(xbee: XBee, CommandQueue: queue.Queue, CommandStopEvent: th
             Command = CommandQueue.get()
 
             if (isinstance(Command, CommandInterface)):
-                data_to_send = Command.encode_packet()
+                EncodedCommand = Command.encode_packet()
+
+                CommandQueue.task_done()
             else:
                 print("Not a command ")
 
@@ -53,7 +47,7 @@ def RunCommandThread(xbee: XBee, CommandQueue: queue.Queue, CommandStopEvent: th
 
             #print("Sending: %s" % data_to_send)
 
-            xbee.transmit_data(data_to_send, DESTINATION)
+            xbee.transmit_data(EncodedCommand, DESTINATION)
 
             #print("Data sent")
 
@@ -75,8 +69,6 @@ def RunTelemetryThread(xbee: XBee, TelemetryQueue: queue.Queue, TelemetryStopEve
                 #print("Retrieved data:", data.received_data.decode("utf-8"))
 
                 ReceivedTelemetry = Telemetry.decode(Data.received_data)
-
-                print(ReceivedTelemetry)
 
                 TelemetryQueue.put(ReceivedTelemetry)
                 
