@@ -15,7 +15,7 @@ authors = [
 
 dependencies = [
   "python-dotenv==1.2.1",
-  "xbee-python @ file:/lib/xbee-python",
+  "xbee-python @ file:lib/xbee-python",
   "gcs-packet @ file:lib/gcs-packet"
 ]
 
