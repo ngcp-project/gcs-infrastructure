@@ -14,9 +14,7 @@ authors = [
 ]
 
 dependencies = [
-  "python-dotenv==1.2.1",
-  "xbee-python @ lib/xbee-python",
-  "gcs-packet @ lib/gcs-packet"
+  "python-dotenv==1.2.1"
 ]
 
 [tool.setuptools.packages.find]
