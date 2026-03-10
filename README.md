@@ -1,6 +1,8 @@
 # GCS Infrastructure
 
-## Setup
+## Standalone
+
+To run ```gcs-infrastructure``` as a standalone repository:
 
 1.) Create and source a venv
 
@@ -10,16 +12,14 @@
 
 4.) ```cd ..```
 
-5.) ```pip install -e "lib/xbee-python"```
-
-6.) ```pip install -e lib/gcs-packet"```
+5.) ```pip install -r requirements.txt```
 
 > [!NOTE]
 > If using VS Code, open the command palette and ensure the python interpreter is set to your venv, or ```xbee-python``` and ```gcs-packet``` classes will not be found
 
 ## Interface
 
-To use ```gcs-infrastructure``` as a submodule:
+To run ```gcs-infrastructure``` as a submodule:
 
 1.) ```git submodule add https://github.com/ngcp-project/gcs-infrastructure```
 

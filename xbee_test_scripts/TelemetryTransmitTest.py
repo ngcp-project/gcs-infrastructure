@@ -100,7 +100,7 @@ def ListenForData(xbee: XBee, StopEvent: threading.Event):
 
                 telem = Telemetry(TelemetryData["Command ID"], TelemetryData["Packet ID"], 0, 0, 0, 0, 0, 0.8, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
 
-                data_to_send = telem.encode()
+                data_to_send = telem.Encode()
 
                 xbee.transmit_data(data_to_send, DESTINATION)
                 # logger.write()

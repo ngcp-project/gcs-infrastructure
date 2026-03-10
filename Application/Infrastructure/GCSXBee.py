@@ -68,7 +68,7 @@ def RunTelemetryThread(xbee: XBee, TelemetryQueue: queue.Queue, TelemetryStopEve
                 print("Data received:\n")
                 #print("Retrieved data:", data.received_data.decode("utf-8"))
 
-                ReceivedTelemetry = Telemetry.decode(Data.received_data)
+                ReceivedTelemetry = Telemetry.Decode(Data.received_data)
 
                 TelemetryQueue.put(ReceivedTelemetry)
                 
