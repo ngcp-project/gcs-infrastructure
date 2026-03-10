@@ -1,6 +1,6 @@
 from Command import *
 from Enum.ConnectionStatus import ConnectionStatus
-from GCSXBee import *
+from GCSXBee import StartXBee
 from Telemetry.Telemetry import Telemetry
 
 from queue import Queue
