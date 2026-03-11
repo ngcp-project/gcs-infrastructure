@@ -81,11 +81,11 @@ def ListenForData(xbee: XBee, StopEvent: threading.Event):
 
                 match(data.received_data[0]):
                     case 1:
-                        Command = Heartbeat.decode_packet(data.received_data)
+                        Command = Heartbeat.DecodePacket(data.received_data)
                     case 2:
-                        Command = EmergencyStop.decode_packet(data.received_data)
+                        Command = EmergencyStop.DecodePacket(data.received_data)
                     case 3:
-                        Command = KeepIn.decode_packet(data.received_data)
+                        Command = KeepIn.DecodePacket(data.received_data)
                     case _:
                         print("\nRetrieved data:", data.received_data.decode("utf-8"))
 

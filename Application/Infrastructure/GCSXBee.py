@@ -1,4 +1,6 @@
 from Command import *
+from Enum import *
+from PacketLibrary.PacketLibrary import PacketLibrary
 from Telemetry.Telemetry import Telemetry
 
 import queue
@@ -8,7 +10,7 @@ from xbee import XBee
 
 #PORT = "COM4"
 BAUD_RATE = 115200
-DESTINATION = "0013A200428396C0"
+
 # 00 13 A2 00 42 43 5E A9
 def StartXBee(PORT: str, CommandQueue: queue.Queue, TelemetryQueue: queue.Queue):
     # Initialize XBee object
@@ -35,7 +37,7 @@ def RunCommandThread(xbee: XBee, CommandQueue: queue.Queue, CommandStopEvent: th
             Command = CommandQueue.get()
 
             if (isinstance(Command, CommandInterface)):
-                EncodedCommand = Command.encode_packet()
+                EncodedCommand = Command.EncodePacket()
 
                 CommandQueue.task_done()
             else:
@@ -45,9 +47,12 @@ def RunCommandThread(xbee: XBee, CommandQueue: queue.Queue, CommandStopEvent: th
                     
                 continue
 
-            #print("Sending: %s" % data_to_send)
-
-            xbee.transmit_data(EncodedCommand, DESTINATION)
+            if (Command.Vehicle == Vehicle.ALL):
+                xbee.transmit_data(EncodedCommand, PacketLibrary.MRA_MAC_ADDRESS)
+                xbee.transmit_data(EncodedCommand, PacketLibrary.MEA_MAC_ADDRESS)
+                xbee.transmit_data(EncodedCommand, PacketLibrary.ERU_MAC_ADDRESS)
+            else:
+                xbee.transmit_data(EncodedCommand, PacketLibrary.GetMACAddressFromVehicle(Command.Vehicle))
 
             #print("Data sent")
 
@@ -65,10 +70,13 @@ def RunTelemetryThread(xbee: XBee, TelemetryQueue: queue.Queue, TelemetryStopEve
             Data = xbee.retrieve_data()
 
             if Data:
-                print("Data received:\n")
+                #print("Data received:\n")
                 #print("Retrieved data:", data.received_data.decode("utf-8"))
 
                 ReceivedTelemetry = Telemetry.Decode(Data.received_data)
+
+                ReceivedTelemetry.Vehicle = PacketLibrary.GetVehicleFromMACAddress(Data.address_64.hex())
+                ReceivedTelemetry.MACAddress = Data.address_64.hex()
 
                 TelemetryQueue.put(ReceivedTelemetry)
                 

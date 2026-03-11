@@ -41,7 +41,7 @@ def main():
             Command = ProcessCommand(data_to_send)
 
             if (Command is not None):
-                data_to_send = Command.encode_packet()
+                data_to_send = Command.EncodePacket()
             else:
                 data_to_send.encode()
 
