@@ -66,7 +66,7 @@ TelemetryInstance = ReceiveTelemetry()
 
 ## Example Scripts
 
-Test scripts are found in ```gcs-infrastructure/xbee_test_scripts```
+Test scripts are found in ```gcs-infrastructure/TestScripts```
 
 Run CommandTransmitTest.py in one window and TelemetryTransmitTest.py in another to test XBee communication, as well as sending commands and receiving telemetry
 
