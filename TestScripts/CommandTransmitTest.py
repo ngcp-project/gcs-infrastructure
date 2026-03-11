@@ -41,7 +41,7 @@ def main():
             Command = ProcessCommand(data_to_send)
 
             if (Command is not None):
-                data_to_send = Command.encode_packet()
+                data_to_send = Command.EncodePacket()
             else:
                 data_to_send.encode()
 
@@ -149,7 +149,7 @@ def ListenForData(xbee: XBee, StopEvent: threading.Event):
                 print("Data received")
                 #print("Retrieved data:", data.received_data.decode("utf-8"))
 
-                telem = Telemetry.decode(data.received_data)
+                telem = Telemetry.Decode(data.received_data)
 
                 print(telem)
 

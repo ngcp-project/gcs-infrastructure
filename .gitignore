@@ -4,9 +4,13 @@ test/
 
 __pycache__/
 
+test.py
+
 todo.txt
 
 *log.txt
+
+**/Logs/
 
 */Logs*
 

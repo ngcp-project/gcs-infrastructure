@@ -81,11 +81,11 @@ def ListenForData(xbee: XBee, StopEvent: threading.Event):
 
                 match(data.received_data[0]):
                     case 1:
-                        Command = Heartbeat.decode_packet(data.received_data)
+                        Command = Heartbeat.DecodePacket(data.received_data)
                     case 2:
-                        Command = EmergencyStop.decode_packet(data.received_data)
+                        Command = EmergencyStop.DecodePacket(data.received_data)
                     case 3:
-                        Command = KeepIn.decode_packet(data.received_data)
+                        Command = KeepIn.DecodePacket(data.received_data)
                     case _:
                         print("\nRetrieved data:", data.received_data.decode("utf-8"))
 
@@ -100,7 +100,7 @@ def ListenForData(xbee: XBee, StopEvent: threading.Event):
 
                 telem = Telemetry(TelemetryData["Command ID"], TelemetryData["Packet ID"], 0, 0, 0, 0, 0, 0.8, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
 
-                data_to_send = telem.encode()
+                data_to_send = telem.Encode()
 
                 xbee.transmit_data(data_to_send, DESTINATION)
                 # logger.write()

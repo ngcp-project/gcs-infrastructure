@@ -1,2 +1,2 @@
--e ./lib/gcs-packet
--e ./lib/xbee-python
+-e lib/gcs-packet
+-e lib/xbee-python
