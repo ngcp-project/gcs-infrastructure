@@ -30,33 +30,59 @@ To run ```gcs-infrastructure``` as a submodule:
 To start the GCS XBee:
 
 ```python
-from InfrastructureInterface import LaunchXBee
+from InfrastructureInterface import LaunchGCSXBee
 
-LaunchXBee(PORT)
+LaunchGCSXBee(PORT)
+```
+
+To start a vehicle XBee:
+```python
+from InfrastructureInterface import LaunchVehicleXBee
+
+LaunchVehicleXBee(PORT)
 ```
 
 > [!NOTE]
-> Never call LaunchXBee more than once. In the future calling it more than once will return a clearer error
+> Never call either LaunchXBee function more than once. In the future calling it more than once will return a clearer error. ```LaunchGCSXBee``` and ```LaunchVehicleXBee``` are mutually exclusive and should not be called in the same file
 
-To send a Command
+To send a Command:
 
 ```python
 from InfrastructureInterface import SendCommand
 
-#Assuming LaunchXBee was called earlier, Command is any Command object
+# Assuming LaunchGCSXBee was called earlier, CommandInstance is any Command object
 
-SendCommand(Command)
-
+SendCommand(CommandInstance, Vehicle.ALL)
 ```
 
-To receive Telemetry
+To send Telemetry:
+
+```python
+from InfrastructureInterface import SendTelemetry
+
+# Assuming LaunchVehicleXbee was called earlier, TelemetryInstance is a Telemetry object
+
+SendTelemetry(TelemetryInstance)
+```
+
+To receive a Command:
+
+```python
+from InfrastructureInterface import ReceiveCommand
+
+# Assuming LaunchVehicleXBee was called earlier, ReceivedCommand will be assigned to a Command object
+
+ReceivedCommand = ReceiveCommand()
+```
+
+To receive Telemetry:
 
 ```python
 from InfrastructureInterface import ReceiveTelemetry
 
-#Assuming LaunchXBee was called earlier
+#Assuming LaunchGCSXBee was called earlier, ReceivedTelemetry will be a Telemetry object
 
-TelemetryInstance = ReceiveTelemetry()
+ReceivedTelemetry = ReceiveTelemetry()
 ```
 
 >[!NOTE]
