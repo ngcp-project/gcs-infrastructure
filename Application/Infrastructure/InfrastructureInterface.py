@@ -1,30 +1,38 @@
 from Command import *
 from Enum import *
-from Infrastructure.GCSXBee import StartXBee
-from PacketLibrary.PacketLibrary import PacketLibrary
+from Infrastructure.GCSXBee import StartGCSXBee
+from Infrastructure.VehicleXBee import StartVehicleXBee
+from Infrastructure.PacketQueue import *
 from Telemetry.Telemetry import Telemetry
 
-from queue import Queue
+def LaunchGCSXBee(PORT: str):
+    StartGCSXBee(PORT)
 
-import ast
-import threading
+def LaunchVehicleXBee(PORT: str):
+    StartVehicleXBee(PORT)
 
-from xbee import XBee
+def SendCommand(CommandInstance: CommandInterface, VehicleName: Vehicle):
+    CommandInstance.Vehicle = VehicleName
 
-CommandQueue = Queue(maxsize = 0)
-TelemetryQueue = Queue(maxsize = 0)
-
-def LaunchXBee(PORT: str):
-    StartXBee(PORT, CommandQueue, TelemetryQueue)
-
-def SendCommand(Command: CommandInterface, VehicleName: Vehicle):
-    Command.Vehicle = VehicleName
-
-    CommandQueue.put(Command)
+    CommandQueue.put(CommandInstance)
 
     print("Command Queued")
 
-def ReceiveTelemetry():
+def SendTelemetry(TelemetryInstance: Telemetry):
+    TelemetryQueue.put(TelemetryInstance)
+
+    print("Command Queued")
+
+def ReceiveCommand() -> CommandInterface:
+    CommandInstance = CommandQueue.get()
+
+    CommandQueue.task_done()
+
+    print("Command Received")
+
+    return CommandInstance
+
+def ReceiveTelemetry() -> Telemetry:
     TelemetryInstance = TelemetryQueue.get()
 
     TelemetryQueue.task_done()

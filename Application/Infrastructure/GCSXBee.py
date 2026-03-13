@@ -1,5 +1,6 @@
 from Command import *
 from Enum import *
+from Infrastructure.PacketQueue import *
 from PacketLibrary.PacketLibrary import PacketLibrary
 from Telemetry.Telemetry import Telemetry
 
@@ -12,7 +13,7 @@ from xbee import XBee
 BAUD_RATE = 115200
 
 # 00 13 A2 00 42 43 5E A9
-def StartXBee(PORT: str, CommandQueue: queue.Queue, TelemetryQueue: queue.Queue):
+def StartGCSXBee(PORT: str):
     # Initialize XBee object
     xbee = XBee(PORT, BAUD_RATE)
 
@@ -25,34 +26,34 @@ def StartXBee(PORT: str, CommandQueue: queue.Queue, TelemetryQueue: queue.Queue)
     CommandStopEvent = threading.Event()
     TelemetryStopEvent = threading.Event()
 
-    CommandThread = threading.Thread(target = RunCommandThread, args = (xbee, CommandQueue, CommandStopEvent))
+    CommandThread = threading.Thread(target = RunCommandThread, args = (xbee, CommandStopEvent))
     CommandThread.start()
 
-    TelemetryThread = threading.Thread(target = RunTelemetryThread, args = (xbee, TelemetryQueue, TelemetryStopEvent))
+    TelemetryThread = threading.Thread(target = RunTelemetryThread, args = (xbee, TelemetryStopEvent))
     TelemetryThread.start()
 
-def RunCommandThread(xbee: XBee, CommandQueue: queue.Queue, CommandStopEvent: threading.Event):
+def RunCommandThread(xbee: XBee, CommandStopEvent: threading.Event):
     while xbee is not None and xbee.ser is not None and not CommandStopEvent.is_set():
         try:
-            Command = CommandQueue.get()
+            CommandInstance = CommandQueue.get()
 
-            if (isinstance(Command, CommandInterface)):
-                EncodedCommand = Command.EncodePacket()
+            if (isinstance(CommandInstance, CommandInterface)):
+                EncodedCommand = CommandInstance.EncodePacket()
 
                 CommandQueue.task_done()
             else:
-                print("Not a command ")
+                print("Not a command")
 
                 CommandQueue.task_done()
                     
                 continue
 
-            if (Command.Vehicle == Vehicle.ALL):
+            if (CommandInstance.Vehicle == Vehicle.ALL):
                 xbee.transmit_data(EncodedCommand, PacketLibrary.MRA_MAC_ADDRESS)
                 xbee.transmit_data(EncodedCommand, PacketLibrary.MEA_MAC_ADDRESS)
                 xbee.transmit_data(EncodedCommand, PacketLibrary.ERU_MAC_ADDRESS)
             else:
-                xbee.transmit_data(EncodedCommand, PacketLibrary.GetMACAddressFromVehicle(Command.Vehicle))
+                xbee.transmit_data(EncodedCommand, PacketLibrary.GetMACAddressFromVehicle(CommandInstance.Vehicle))
 
             #print("Data sent")
 
@@ -64,7 +65,7 @@ def RunCommandThread(xbee: XBee, CommandQueue: queue.Queue, CommandStopEvent: th
     if (xbee is not None):
         xbee.close()
 
-def RunTelemetryThread(xbee: XBee, TelemetryQueue: queue.Queue, TelemetryStopEvent: threading.Event):
+def RunTelemetryThread(xbee: XBee, TelemetryStopEvent: threading.Event):
     while xbee is not None and xbee.ser is not None and not TelemetryStopEvent.is_set():
         try:
             Data = xbee.retrieve_data()
