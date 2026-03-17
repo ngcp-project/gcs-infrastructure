@@ -1,0 +1,36 @@
+<launch>
+    <arg name="xbee_port" default="/dev/ttyUSB0"/>
+    <arg name="send_rate_hz" default="1.0"/>
+    <arg name="battery_life_default" default="1.0"/>
+    <arg name="patient_status_default" default="0"/>
+    <arg name="message_flag_default" default="0"/>
+    <arg name="message_lat_default" default="0.0"/>
+    <arg name="message_lon_default" default="0.0"/>
+
+    <arg name="position_topic" default="filter/positionlla"/>
+    <arg name="euler_topic" default="filter/euler"/>
+    <arg name="velocity_topic" default="filter/velocity"/>
+    <arg name="status_topic" default="status"/>
+
+    <include file="$(find xsens_mti_driver)/launch/xsens_mti_node.launch"/>
+
+    <node
+        name="xsens_to_gcs_bridge"
+        pkg="xsens_mti_driver"
+        type="xsens_to_gcs_bridge.py"
+        output="screen"
+        required="true">
+        <param name="xbee_port" value="$(arg xbee_port)"/>
+        <param name="send_rate_hz" value="$(arg send_rate_hz)"/>
+        <param name="battery_life_default" value="$(arg battery_life_default)"/>
+        <param name="patient_status_default" value="$(arg patient_status_default)"/>
+        <param name="message_flag_default" value="$(arg message_flag_default)"/>
+        <param name="message_lat_default" value="$(arg message_lat_default)"/>
+        <param name="message_lon_default" value="$(arg message_lon_default)"/>
+
+        <param name="position_topic" value="$(arg position_topic)"/>
+        <param name="euler_topic" value="$(arg euler_topic)"/>
+        <param name="velocity_topic" value="$(arg velocity_topic)"/>
+        <param name="status_topic" value="$(arg status_topic)"/>
+    </node>
+</launch>
