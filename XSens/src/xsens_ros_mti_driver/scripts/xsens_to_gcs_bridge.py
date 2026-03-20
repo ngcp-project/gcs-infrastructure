@@ -19,37 +19,73 @@ from geometry_msgs.msg import Vector3Stamped
 from xsens_mti_driver.msg import XsStatusWord
 
 
+def _prepend_if_dir(path: str) -> None:
+    """Prepend path to sys.path when the directory exists."""
+    if os.path.isdir(path) and path not in sys.path:
+        sys.path.insert(0, path)
+
+
+def _bootstrap_import_paths() -> list:
+    """Collect and configure local paths for gcs-infrastructure dependencies."""
+    candidate_roots = []
+
+    env_root = os.environ.get("GCS_INFRASTRUCTURE_ROOT")
+    if env_root:
+        candidate_roots.append(os.path.abspath(env_root))
+
+    candidate_roots.append(os.path.abspath(os.getcwd()))
+
+    # Probe script location and ancestors so this works from source and devel wrappers.
+    probe = os.path.abspath(os.path.dirname(__file__))
+    for _ in range(8):
+        candidate_roots.append(probe)
+        parent = os.path.dirname(probe)
+        if parent == probe:
+            break
+        probe = parent
+
+    # De-duplicate while preserving order.
+    unique_roots = []
+    for root in candidate_roots:
+        if root not in unique_roots:
+            unique_roots.append(root)
+
+    for root in unique_roots:
+        _prepend_if_dir(os.path.join(root, "Application"))
+        _prepend_if_dir(os.path.join(root, "lib", "gcs-packet"))
+        # gcs-packet exposes top-level packages (Telemetry, Command, Enum, PacketLibrary)
+        # from within its `Packet/` directory.
+        _prepend_if_dir(os.path.join(root, "lib", "gcs-packet", "Packet"))
+        _prepend_if_dir(os.path.join(root, "lib", "gcs-packet", "Application"))
+        _prepend_if_dir(os.path.join(root, "lib", "xbee-python"))
+        _prepend_if_dir(os.path.join(root, "lib", "xbee-python", "src"))
+
+    return unique_roots
+
+
+ATTEMPTED_ROOTS = _bootstrap_import_paths()
+
+
 # Import gcs-infrastructure interfaces. Prefer installed packages first.
 try:
     from Infrastructure import LaunchVehicleXBee, SendTelemetry
-except Exception:
-    # Fallback for local workspace usage where Application is not installed.
-    candidate_roots = []
-    env_root = os.environ.get("GCS_INFRASTRUCTURE_ROOT")
-    if env_root:
-        candidate_roots.append(env_root)
-
-    candidate_roots.append(os.getcwd())
-    candidate_roots.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../")))
-
-    for root in candidate_roots:
-        application_path = os.path.join(root, "Application")
-        if os.path.isdir(application_path) and application_path not in sys.path:
-            sys.path.insert(0, application_path)
-
-    try:
-        from Infrastructure import LaunchVehicleXBee, SendTelemetry
-    except Exception as exc:
-        raise ImportError(
-            "Infrastructure package was not found. Install gcs-infrastructure, "
-            "or set GCS_INFRASTRUCTURE_ROOT to your repository path."
-        ) from exc
+except Exception as exc:
+    raise ImportError(
+        "Failed to import Infrastructure. Ensure dependencies are available "
+        "(git submodule update --init --recursive and pip install -r requirements.txt) "
+        "or set GCS_INFRASTRUCTURE_ROOT to your repository path. "
+        f"Attempted roots: {ATTEMPTED_ROOTS}"
+    ) from exc
 
 try:
+    # VehicleXBee imports Telemetry from `Telemetry.Telemetry`, so import it the
+    # same way here to ensure `isinstance()` checks pass.
     from Telemetry.Telemetry import Telemetry
 except Exception as exc:
     raise ImportError(
-        "Telemetry package was not found. Ensure gcs-packet is installed and importable."
+        "Telemetry package was not found. Ensure gcs-packet is installed (lib/gcs-packet) "
+        "and importable. Expected: Telemetry.Telemetry.Telemetry. "
+        f"Attempted roots: {ATTEMPTED_ROOTS}"
     ) from exc
 
 
@@ -139,20 +175,20 @@ class XsensToGcsBridge:
         snap = self.state.snapshot()
 
         telemetry = Telemetry()
-        telemetry.speed = snap["speed"]
-        telemetry.pitch = snap["pitch"]
-        telemetry.yaw = snap["yaw"]
-        telemetry.roll = snap["roll"]
-        telemetry.altitude = snap["altitude"]
-        telemetry.battery_life = self.battery_life_default
-        telemetry.current_latitude = snap["latitude"]
-        telemetry.current_longitude = snap["longitude"]
-        telemetry.vehicle_status = snap["vehicle_status"]
-        telemetry.patient_status = self.patient_status_default
-        telemetry.message_flag = self.message_flag_default
-        telemetry.message_lat = self.message_lat_default
-        telemetry.message_lon = self.message_lon_default
-        telemetry.last_updated = time.time()
+        telemetry.Speed = snap["speed"]
+        telemetry.Pitch = snap["pitch"]
+        telemetry.Yaw = snap["yaw"]
+        telemetry.Roll = snap["roll"]
+        telemetry.Altitude = snap["altitude"]
+        telemetry.BatteryLife = self.battery_life_default
+        telemetry.CurrentPositionX = snap["latitude"]
+        telemetry.CurrentPositionY = snap["longitude"]
+        telemetry.VehicleStatus = snap["vehicle_status"]
+        telemetry.PatientStatus = self.patient_status_default
+        telemetry.MessageFlag = self.message_flag_default
+        telemetry.MessageLat = self.message_lat_default
+        telemetry.MessageLon = self.message_lon_default
+        telemetry.LastUpdated = int(time.time())
 
         return telemetry
 
