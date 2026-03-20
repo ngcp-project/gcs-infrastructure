@@ -33,15 +33,15 @@ class ControllerState:
         self.ry = ry
         self.stateFrame = stateFrame
 
-    def __repr__():
+    def __repr__(self):
         return (
         "Controller State"
-        f"a={self.a}, b={self.b}, x={self.x}, y={self.y}, "
-        f"lb={self.lb}, rb={self.rb}"
-        f"lt={self.lt:.3f}, rt={self.rt:.3f}"
-        f"back={self.back}, start={self.start}"
-        f"Left Thumb={self.left_thumb}, Right Thumb={self.right_thumb}"
-        f"Left Stick X Axis={self.lx:.3f}, Left Stick Y Axis={self.ly:.3f}"
-        f"Right Stick X Axis={self.rx:.3f}, Right Stick Y Axis={self.ry:.3f}"
+        f"\n A={self.a}, B={self.b}, X={self.x}, Y={self.y}, "
+        f" Lb={self.lb}, Rb={self.rb}"
+        f" Lt={self.lt:.3f}, Rt={self.rt:.3f}"
+        f" Back={self.back}, Start={self.start}"
+        f" Left Thumb={self.left_thumb}, Right Thumb={self.right_thumb}"
+        f" Left Stick X Axis={self.lx:.3f}, Left Stick Y Axis={self.ly:.3f}"
+        f" Right Stick X Axis={self.rx:.3f}, Right Stick Y Axis={self.ry:.3f}"
 
         )

@@ -1,5 +1,5 @@
 import ctypes
-import ControllerState
+from ControllerState import ControllerState
 
 ERROR_SUCCESS = 0
 
@@ -116,9 +116,9 @@ class XInputController:
             right_thumb=self.buttonPressed(buttons, XINPUT_GAMEPAD_RIGHT_THUMB),
             lt=self.normalizeTrigger(gp.bLeftTrigger),
             rt=self.normalizeTrigger(gp.bRightTrigger),
-            lx=self.normalizeTrigger(gp.sThumbLX),
-            ly=self.normalizeTrigger(gp.sThumbLY),
-            rx=self.normalizeTrigger(gp.sThumbRX),
-            ry=self.normalizeTrigger(gp.sThumbRY),
+            lx=self.normalizeStick(gp.sThumbLX),
+            ly=self.normalizeStick(gp.sThumbLY),
+            rx=self.normalizeStick(gp.sThumbRX),
+            ry=self.normalizeStick(gp.sThumbRY),
             stateFrame=state.dwPacketNumber
     )
