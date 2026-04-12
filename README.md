@@ -1,6 +1,33 @@
 # GCS Infrastructure
 
+## Submodule
+
+To run ```gcs-infrastructure``` as a submodule:
+
+In the parent directory of the host respository:
+
+1.) ```mkdir lib```
+
+2.) ```cd lib```
+
+3.) ```git submodule add https://github.com/ngcp-project/gcs-infrastructure```
+
+4.) ```git submodule add https://github.com/ngcp-project/gcs-packet.git```
+
+5.) ```git submodule add https://github.com/ngcp-project/xbee-python.git```
+
+6.) ```git submodule update --init --recursive```
+
+7.) ```pip install -e "gcs-infrastructure"```
+
+8.) ```pip install -e "gcs-packet"```
+
+9.) ```pip install -e "xbee-python"```
+
 ## Standalone
+
+> [!NOTE]
+> The only use case to run ```gcs-infrastructure``` like this is internal testing, install it as a submodule to another repository instead for all other use cases
 
 To run ```gcs-infrastructure``` as a standalone repository:
 
@@ -16,16 +43,6 @@ To run ```gcs-infrastructure``` as a standalone repository:
 
 > [!NOTE]
 > If using VS Code, open the command palette and ensure the python interpreter is set to your venv, or ```xbee-python``` and ```gcs-packet``` classes will not be found
-
-## Interface
-
-To run ```gcs-infrastructure``` as a submodule:
-
-1.) ```git submodule add https://github.com/ngcp-project/gcs-infrastructure```
-
-2.) ```git submodule update --init --recursive```
-
-3.) ```pip install -e "gcs-infrastructure"```
 
 To start the GCS XBee:
 
