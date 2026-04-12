@@ -21,7 +21,7 @@ def SendCommand(CommandInstance: CommandInterface, VehicleName: Vehicle):
 def SendTelemetry(TelemetryInstance: Telemetry):
     TelemetryQueue.put(TelemetryInstance)
 
-    print("Command Queued")
+    print("Telemetry Queued")
 
 def ReceiveCommand() -> CommandInterface:
     CommandInstance = CommandQueue.get()
