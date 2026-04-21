@@ -10,7 +10,7 @@ In the parent directory of the host respository:
 
 2.) ```cd lib```
 
-3.) ```git submodule add https://github.com/ngcp-project/gcs-infrastructure```
+3.) ```git submodule add https://github.com/ngcp-project/gcs-infrastructure.git```
 
 4.) ```git submodule add https://github.com/ngcp-project/gcs-packet.git```
 
@@ -123,7 +123,10 @@ Commands can be sent either by name or using their Command ID as an alias. Comma
 | --- | --- | --- |
 | Heartbeat | 1 | ConnectionStatus |
 | Emergency Stop | 2 | int |
-| Keep In | 3 | tuple(x, y) |
+| Keep In | 3 | list<tuple(x, y)>() |
+| Keep Out | 4 | list<tuple(x, y)>() |
+| Current Patient Location | 5 | tuple(x, y) |
+| Search Area | 6 | list<tuple(x, y)>() |
 
 Any other string will be sent as a string literal
 
