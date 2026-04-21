@@ -41,6 +41,8 @@ To run ```gcs-infrastructure``` as a standalone repository:
 
 5.) ```pip install -r requirements.txt```
 
+6.) ```pip install -e .```
+
 > [!NOTE]
 > If using VS Code, open the command palette and ensure the python interpreter is set to your venv, or ```xbee-python``` and ```gcs-packet``` classes will not be found
 
@@ -111,11 +113,11 @@ ReceivedTelemetry = ReceiveTelemetry()
 
 Test scripts are found in ```gcs-infrastructure/TestScripts```
 
-Run CommandTransmitTest.py in one window and TelemetryTransmitTest.py in another to test XBee communication, as well as sending commands and receiving telemetry
+Run ```GCSTest.py``` in one window and ```VehicleTest.py``` in another to test XBee communication, as well as sending commands and receiving telemetry
 
-### CommandTransmitTest.py
+### GCSTest.py
 
-Serves as a demo gcs able to send commands and receive telemetry from a vehicle
+Serves as a demo GCS able to send commands and receive telemetry from a vehicle
 
 Commands can be sent either by name or using their Command ID as an alias. Command names are case and whitespace insensitive. Send only the command name or alias, the parameters will be entered seperately
 
@@ -130,9 +132,9 @@ Commands can be sent either by name or using their Command ID as an alias. Comma
 
 Any other string will be sent as a string literal
 
-### TelemetryTransmitTest.py
+### VehicleTest.py
 
-Serves as a demo vehicle able to receive commands, generate telemetry, and send it back to the gcs
+Serves as a demo vehicle able to receive commands, generate telemetry, and send it back to the GCS
 
 ## Communication Libraries
 <!-- Libraries? Maybe there will be another one made for future iterations of this project :O -->
@@ -147,6 +149,7 @@ Refer to the [XBee Serial Library][xbee_readme.md] page for further details and 
 
 ## Additional Libraries
 [xbee-python](https://github.com/ngcp-project/xbee-python)
+
 [gcs-packet](https://github.com/ngcp-project/gcs-packet)
 
 ### Logger
