@@ -1,0 +1,21 @@
+ntrip_client:
+  ros__parameters:
+    # NTRIP Server Configuration
+    host: ntrip.earthscope.org  # Change to the IP address of Your NTRIP caster
+    port: 2101                  # Change to your port number WGS84
+    mountpoint: CLAR_RTCM3P3   # Your NTRIP mountpoint
+    username: confident_kowalevski  # Your NTRIP username
+    password: 0bt0VSR2vxHrZn2g # Your NTRIP password
+
+    # NMEA and Update Rate Configuration
+    nmea_input_rate: 4.0          # Input NMEA rate in Hz (default: 4.0)
+    update_rate: 1.0              # Desired rate for sending GGA messages (Hz)
+
+    # Connection Configuration
+    reconnect_delay: 5.0          # Delay between reconnection attempts (seconds)
+    max_reconnect_attempts: 0     # 0 for infinite attempts
+
+    # Debug Configuration
+    send_default_gga: True        # Set to False if using real GNSS data
+    debug: True                   # Set to True for detailed debug output
+    output_rtcm_details: True     # Set to True for RTCM message details
