@@ -4,10 +4,6 @@ test/
 
 __pycache__/
 
-test.py
-GCSTest.py
-VehicleTest.py
-
 todo.txt
 
 *log.txt

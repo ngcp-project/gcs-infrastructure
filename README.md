@@ -152,12 +152,6 @@ Refer to the [XBee Serial Library][xbee_readme.md] page for further details and 
 
 [gcs-packet](https://github.com/ngcp-project/gcs-packet)
 
-### Logger
-Logger builds off of Python's [logging](https://docs.python.org/3/library/logging.html) module and is used to track events that occur when using the XBee serial library (or any other libraries that may be used in the future).
-
-[xbee_readme.md]: ./Communication/XBee/README.md
-[xbee_rr_datasheet]: ./Communication/XBee/docs/files/digi-xbee-rr-802-15-4-rf-module-datasheet.pdf
-
 ## Troubleshooting
 
 Sometimes xbee-python and gcs-packet packages cannot be resolved by Python. If this occurs, it is best to delete the repository and re-clone it. Doing the setup and running the Python scripts in Windows Powershell is recommended. Ensure that the Python interpreter you are using to run the code is using the virtual environment you used to install the libraries.
