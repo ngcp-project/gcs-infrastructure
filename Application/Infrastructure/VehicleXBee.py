@@ -41,26 +41,8 @@ def RunCommandThread(xbee: XBee, CommandStopEvent: threading.Event):
                 #print("Data received:\n")
                 #print("Retrieved data:", data.received_data.decode("utf-8"))
 
-                CommandInstance = None
-
-                match(Data.received_data[0]):
-                    case 1:
-                        CommandInstance = Heartbeat.DecodePacket(Data.received_data)
-                    case 2:
-                        CommandInstance = EmergencyStop.DecodePacket(Data.received_data)
-                    case 3:
-                        CommandInstance = KeepIn.DecodePacket(Data.received_data)
-                    case 4:
-                        CommandInstance = KeepOut.DecodePacket(Data.received_data)
-                    case 5:
-                        CommandInstance = PatientLocation.DecodePacket(Data.received_data)
-                    case 6:
-                        CommandInstance = SearchArea.DecodePacket(Data.received_data)
-                    case _:
-                        print("\nRetrieved data:", Data.received_data.decode("utf-8"))
-
-                if (CommandInstance is not None):
-                    CommandQueue.put(CommandInstance)
+                if (Data is not None):
+                    CommandQueue.put(Data)
                 
         except Exception as e:
             print(f"Error: {e}")
