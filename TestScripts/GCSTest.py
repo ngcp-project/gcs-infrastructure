@@ -22,7 +22,7 @@ KeepInCoordinates = [[0, 4], [4, 0], [4, 4], [0, 4]]
 
 Command1 = Heartbeat(ConnectionStatus.Connected)
 Command2 = EmergencyStop(0)
-Command3 = KeepIn(KeepInCoordinates)
+Command3 = AddZone(ZoneType.KeepIn, KeepInCoordinates)
 
 SendCommand(Command1, Vehicle.MRA)
 SendCommand(Command2, Vehicle.MRA)
@@ -50,23 +50,38 @@ def main():
             if (Command is not None):
                 SendCommand(Command, Vehicle.MRA)
 
-            Telemetry = ReceiveTelemetry()
+            TelemetryInstance = ReceiveTelemetry()
 
-            if (Telemetry is not None):
-                print(Telemetry)
+            if (TelemetryInstance is not None):
+                print(TelemetryInstance)
         
         except Exception as e:
             print(f"Error: {e}")
 
 def ProcessCommand(Command: str):
-    if ((Command.replace(" ", "").upper() == "HEARTBEAT") or (Command == "1")):
+    if ((Command.replace(" ", "").upper() == "HEARTBEAT") or (Command.replace(" ", "") == "1")):
         return HeartbeatCommand()
-    elif ((Command.replace(" ", "").upper() == "EMERGENCYSTOP") or (Command == "2")):
+    elif ((Command.replace(" ", "").upper() == "EMERGENCYSTOP") or (Command.replace(" ", "") == "2")):
         return EmergencyStopCommand()
-    elif ((Command.replace(" ", "").upper() == "KEEPIN") or (Command == "3")):
-        return KeepInCommand()
+    elif ((Command.replace(" ", "").upper() == "ADDZONE") or (Command.replace(" ", "") == "3")):
+        return AddZoneCommand()
+    elif ((Command.replace(" ", "").upper() == "PATIENTLOCATION") or (Command.replace(" ", "") == "4")):
+        return PatientLocationCommand()
     
     return None
+
+def EmergencyStopCommand():
+    print("Emergency Stop Command\nEnter Stop Status:")
+
+    while True:
+        Input = input()
+
+        try:
+            StopStatus = int(Input)
+
+            return EmergencyStop(StopStatus)
+        except ValueError:
+            print("Integer Required")
 
 def HeartbeatCommand():
     print("Heartbeat Command\nEnter Connection Status:")
@@ -81,11 +96,24 @@ def HeartbeatCommand():
         elif ((Input.upper() == "DISCONNECTED") or (Input == "2")):
             return Heartbeat(ConnectionStatus.Disconnected)
 
-def KeepInCommand():
-    print("Keep In Command\nEnter up to 6 coordinates:")
+def AddZoneCommand():
+    print("Add Zone Command\nEnter Zone Type:")
 
     Coordinates = []
-    CoordinateCount = 1
+    CoordinateCount = 0
+    Zone = None
+
+    while (Zone == None):
+        Input = input()
+
+        if ((Input.upper() == "KEEPIN") or (Input == "0")):
+            Zone = ZoneType.KeepIn
+        elif ((Input.upper() == "KEEPOUT") or (Input == "1")):
+            Zone = ZoneType.KeepOut
+        elif ((Input.upper() == "SEARCHAREA") or (Input == "2")):
+            Zone = ZoneType.SearchArea
+    
+    print("Enter 3 to 6 Coordinates:")
 
     while True:
         print(f"Enter Coordinate {CoordinateCount} as (x, y), or q to end:")
@@ -93,9 +121,9 @@ def KeepInCommand():
         Input = input()
 
         try:
-            if (CoordinateCount <= 6):
-                if (Input.upper() == "Q"):
-                    return KeepIn(Coordinates)
+            if (CoordinateCount < 6):
+                if ((Input.upper() == "Q") and (CoordinateCount >= 3)):
+                    return AddZone(Zone, Coordinates)
 
                 Coordinate = ast.literal_eval(Input)
 
@@ -105,22 +133,22 @@ def KeepInCommand():
 
                 CoordinateCount += 1
             else:
-                return KeepIn(Coordinates)
+                return AddZone(Zone, Coordinates)
         except Exception:
             print("Invalid tuple")
-        
-def EmergencyStopCommand():
-    print("Emergency Stop Command\nEnter Stop Status:")
+
+def PatientLocationCommand():
+    print("Patient Location Command\nEnter Coordinate as (x, y):")
 
     while True:
         Input = input()
 
         try:
-            StopStatus = int(Input)
+            Coordinate = ast.literal_eval(Input)
 
-            return EmergencyStop(StopStatus)
-        except ValueError:
-            print("Integer Required")
+            return PatientLocation(Coordinate)
+        except Exception:
+            print("Invalid tuple")
 
 if __name__ == '__main__':
     main()

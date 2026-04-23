@@ -23,8 +23,26 @@ def SendTelemetry(TelemetryInstance: Telemetry):
 
     print("Telemetry Queued")
 
-def ReceiveCommand() -> CommandInterface:
-    CommandInstance = CommandQueue.get()
+def ReceiveCommand(DecodeResult: DecodeFormat) -> CommandInterface:
+    Data = CommandQueue.get()
+
+    CommandInstance = None
+    
+    match(Data.received_data[0]):
+        case 1:
+            CommandInstance = Heartbeat.DecodePacket(Data.received_data, DecodeResult)
+
+        case 2:
+            CommandInstance = EmergencyStop.DecodePacket(Data.received_data, DecodeResult)
+
+        case 3:
+            CommandInstance = AddZone.DecodePacket(Data.received_data, DecodeResult)
+
+        case 5:
+            CommandInstance = PatientLocation.DecodePacket(Data.received_data, DecodeResult)
+
+        case _:
+            print("\nRetrieved data:", Data.received_data.decode("utf-8"))
 
     CommandQueue.task_done()
 
