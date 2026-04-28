@@ -69,11 +69,7 @@ def main():
             if (Command is not None):
                 SendCommand(Command, Vehicle.MRA)
 
-<<<<<<< HEAD
             TelemetryInstance = ReceiveTelemetry(True)
-=======
-            TelemetryInstance = ReceiveTelemetry()
->>>>>>> main
 
             if (TelemetryInstance is not None):
                 print(TelemetryInstance)
