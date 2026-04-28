@@ -28,15 +28,34 @@ SendCommand(Command1, Vehicle.MRA)
 SendCommand(Command2, Vehicle.MRA)
 SendCommand(Command3, Vehicle.MRA)
 
-Telemetry1 = ReceiveTelemetry()
-Telemetry2 = ReceiveTelemetry()
-Telemetry3 = ReceiveTelemetry()
+Telemetry1 = None
+Telemetry2 = None
+Telemetry3 = None
 
-print(f"MAC Address of {Telemetry1.Vehicle} is {Telemetry1.MACAddress}")
+while True:
+    if (Telemetry1 is None):
+        Telemetry1 = ReceiveTelemetry(False)
 
-print(Telemetry1)
-print(Telemetry2)
-print(Telemetry3)
+        continue
+
+    if (Telemetry2 is None):
+        Telemetry2 = ReceiveTelemetry(False)
+
+        continue
+
+    if (Telemetry3 is None):
+        Telemetry3 = ReceiveTelemetry(False)
+
+        continue
+
+    if ((Telemetry1 != None) and (Telemetry2 != None) and (Telemetry3 != None)):
+        print(f"MAC Address of {Telemetry1.Vehicle} is {Telemetry1.MACAddress}")
+
+        print(Telemetry1)
+        print(Telemetry2)
+        print(Telemetry3)
+
+        break
 
 # End of the example. The rest is for live command sending
 
@@ -50,7 +69,7 @@ def main():
             if (Command is not None):
                 SendCommand(Command, Vehicle.MRA)
 
-            TelemetryInstance = ReceiveTelemetry()
+            TelemetryInstance = ReceiveTelemetry(True)
 
             if (TelemetryInstance is not None):
                 print(TelemetryInstance)

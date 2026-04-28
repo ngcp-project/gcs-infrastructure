@@ -89,9 +89,9 @@ To receive a Command:
 ```python
 from InfrastructureInterface import ReceiveCommand
 
-# Assuming LaunchVehicleXBee was called earlier, ReceivedCommand will be assigned to a Command object
+# Assuming LaunchVehicleXBee was called earlier, ReceivedCommand will be assigned to a Command object. Blocking is a boolean that defines whether the queue should block the thread for up to 5 seconds or not. DecodeType is the DecodeFormat the command should be retuned as
 
-ReceivedCommand = ReceiveCommand()
+ReceivedCommand = ReceiveCommand(Blocking, DecodeType)
 ```
 
 To receive Telemetry:
@@ -99,13 +99,13 @@ To receive Telemetry:
 ```python
 from InfrastructureInterface import ReceiveTelemetry
 
-#Assuming LaunchGCSXBee was called earlier, ReceivedTelemetry will be a Telemetry object
+#Assuming LaunchGCSXBee was called earlier, ReceivedTelemetry will be a Telemetry object. Blocking is a boolean that defines whether the queue should block the thread for up to 5 seconds or not.
 
-ReceivedTelemetry = ReceiveTelemetry()
+ReceivedTelemetry = ReceiveTelemetry(Blocking)
 ```
 
 >[!NOTE]
-> ```SendCommand``` and ```ReceiveTelemetry``` are blocking for the duration of time it takes to add to or remove from the queue. This may be made optional later
+> ```SendCommand``` and ```ReceiveTelemetry``` will now only block the thread if ```Blocking``` is True. If it is a blocking call the thread will block up to 5 seconds before returning ```None```
 
 
 

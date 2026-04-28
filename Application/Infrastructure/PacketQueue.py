@@ -1,4 +1,4 @@
-from queue import Queue
+import queue
 
-CommandQueue = Queue(maxsize = 0)
-TelemetryQueue = Queue(maxsize = 0)
+CommandQueue = queue.Queue(maxsize = 0)
+TelemetryQueue = queue.Queue(maxsize = 0)

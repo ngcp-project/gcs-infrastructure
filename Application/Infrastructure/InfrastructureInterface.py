@@ -14,17 +14,20 @@ def LaunchVehicleXBee(PORT: str):
 def SendCommand(CommandInstance: CommandInterface, VehicleName: Vehicle):
     CommandInstance.Vehicle = VehicleName
 
-    CommandQueue.put(CommandInstance)
+    CommandQueue.put(CommandInstance, False)
 
     print("Command Queued")
 
 def SendTelemetry(TelemetryInstance: Telemetry):
-    TelemetryQueue.put(TelemetryInstance)
+    TelemetryQueue.put(TelemetryInstance, False)
 
     print("Telemetry Queued")
 
-def ReceiveCommand(DecodeResult: DecodeFormat) -> CommandInterface:
-    Data = CommandQueue.get()
+def ReceiveCommand(Blocking: bool = False, DecodeResult: DecodeFormat = DecodeFormat.Class) -> CommandInterface | None:
+    try:
+        Data = CommandQueue.get(Blocking, 5.0)
+    except queue.Empty:
+        return None
 
     CommandInstance = None
     
@@ -38,7 +41,7 @@ def ReceiveCommand(DecodeResult: DecodeFormat) -> CommandInterface:
         case 3:
             CommandInstance = AddZone.DecodePacket(Data.received_data, DecodeResult)
 
-        case 5:
+        case 4:
             CommandInstance = PatientLocation.DecodePacket(Data.received_data, DecodeResult)
 
         case _:
@@ -50,8 +53,11 @@ def ReceiveCommand(DecodeResult: DecodeFormat) -> CommandInterface:
 
     return CommandInstance
 
-def ReceiveTelemetry() -> Telemetry:
-    TelemetryInstance = TelemetryQueue.get()
+def ReceiveTelemetry(Blocking: bool = False) -> Telemetry | None:
+    try:
+        TelemetryInstance = TelemetryQueue.get(Blocking, 5.0)
+    except queue.Empty:
+        return None
 
     TelemetryQueue.task_done()
 
