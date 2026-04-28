@@ -16,13 +16,32 @@ PacketLibrary.SetGCSMACAddress("0013A2004283A0EC")
 
 LaunchVehicleXBee(PORT)
 
-Command1 = ReceiveCommand(DecodeFormat.Class)
-Command2 = ReceiveCommand(DecodeFormat.Class)
-Command3 = ReceiveCommand(DecodeFormat.Class)
+Command1 = None
+Command2 = None
+Command3 = None
 
-print(Command1)
-print(Command2)
-print(Command3)
+while True:
+    if (Command1 is None):
+        Command1 = ReceiveCommand(False, DecodeFormat.Class)
+
+        continue
+
+    if (Command2 is None):
+        Command2 = ReceiveCommand(False, DecodeFormat.Class)
+
+        continue
+
+    if (Command3 is None):
+        Command3 = ReceiveCommand(False, DecodeFormat.Class)
+
+        continue
+
+    if ((Command1 != None) and (Command2 != None) and (Command3 != None)):
+        print(Command1)
+        print(Command2)
+        print(Command3)
+
+        break
 
 #try:
     #CommandData1 = json.loads(Command1)
@@ -47,7 +66,10 @@ SendTelemetry(Telemetry3)
 # End of the example. The rest is for live command receiving
 
 while (True):
-    Command = ReceiveCommand(DecodeFormat.Class)
+    Command = ReceiveCommand(False, DecodeFormat.Class)
+
+    if (Command is None):
+        continue
 
     print(type(Command))
 
@@ -61,7 +83,7 @@ while (True):
             case EmergencyStop():
                 print("Executing Emergency Stop code")
             case AddZone():
-                print("Executing Keep In code")
+                print("Executing Add Zone code")
             case PatientLocation():
                 print("Executing Patient Location code")
             case _:

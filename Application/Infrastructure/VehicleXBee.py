@@ -4,7 +4,6 @@ from Infrastructure.PacketQueue import *
 from PacketLibrary.PacketLibrary import PacketLibrary
 from Telemetry.Telemetry import Telemetry
 
-import queue
 import threading
 
 from xbee import XBee
@@ -71,7 +70,7 @@ def RunTelemetryThread(xbee: XBee, TelemetryStopEvent: threading.Event):
             #print("Data sent")
                 
         except queue.Empty as e:
-            print(f"Error: {e}")
+            continue
         except Exception as e:
             print(f"Error: {e}")
 

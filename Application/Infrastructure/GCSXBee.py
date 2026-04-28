@@ -58,7 +58,7 @@ def RunCommandThread(xbee: XBee, CommandStopEvent: threading.Event):
             #print("Data sent")
 
         except queue.Empty as e:
-            print(f"Error: {e}")
+            continue
         except Exception as e:
             print(f"Error: {e}")
 
@@ -81,8 +81,6 @@ def RunTelemetryThread(xbee: XBee, TelemetryStopEvent: threading.Event):
 
                 TelemetryQueue.put(ReceivedTelemetry)
                 
-        except queue.Empty as e:
-            print(f"Error: {e}")
         except Exception as e:
             print(f"Error: {e}")
 

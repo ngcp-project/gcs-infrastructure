@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gcs-infrastructure"
-version = "0.2.2"
+version = "0.2.3"
 description = "GCS Infrastructure Interface and Tests"
 requires-python = ">=3.8"
 
