@@ -27,7 +27,7 @@ while True:
         continue
 
     if (Command2 is None):
-        Command2 = ReceiveCommand(False, DecodeFormat.Class)
+        Command2 = ReceiveCommand(False, DecodeFormat.JSON)
 
         continue
 
@@ -42,21 +42,14 @@ while True:
         print(Command3)
 
         break
+try:
+    CommandData2 = json.loads(Command2)
 
-#try:
-    #CommandData1 = json.loads(Command1)
-    #CommandData2 = json.loads(Command2)
-    #CommandData3 = json.loads(Command3)
-                    
-#except json.JSONDecodeError as e:
-    #print(f"JSON Error: {e}")
-
-#Telemetry1 = Telemetry(CommandData1["Command ID"], CommandData1["Packet ID"], 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
-#Telemetry2 = Telemetry(CommandData2["Command ID"], CommandData2["Packet ID"], 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
-#Telemetry3 = Telemetry(CommandData3["Command ID"], CommandData3["Packet ID"], 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
+except json.JSONDecodeError as e:
+    print(f"JSON Error: {e}")
 
 Telemetry1 = Telemetry(Command1.COMMAND_ID, Command1.PacketID, 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
-Telemetry2 = Telemetry(Command2.COMMAND_ID, Command2.PacketID, 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
+Telemetry2 = Telemetry(CommandData2["Command ID"], CommandData2["Packet ID"], 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
 Telemetry3 = Telemetry(Command3.COMMAND_ID, Command3.PacketID, 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
 
 SendTelemetry(Telemetry1)
@@ -71,7 +64,7 @@ while (True):
     if (Command is None):
         continue
 
-    print(type(Command))
+    print(Command)
 
     try:
         if (isinstance(Command, str)):
