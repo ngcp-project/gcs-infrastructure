@@ -62,6 +62,8 @@ while True:
 def main():
     while True:
         try:
+            print("Enter a Command:")
+            
             Data = input()
 
             Command = ProcessCommand(Data)
