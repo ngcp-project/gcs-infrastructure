@@ -72,7 +72,7 @@ def RunTelemetryThread(xbee: XBee, TelemetryStopEvent: threading.Event):
 
             if Data:
                 #print("Data received:\n")
-                #print("Retrieved data:", data.received_data.decode("utf-8"))
+                #print("Retrieved data:", Data.received_data.decode("utf-8"))
 
                 ReceivedTelemetry = Telemetry.Decode(Data.received_data)
 
