@@ -8,7 +8,6 @@ import threading
 
 from xbee import XBee
 
-#PORT = "COM4"
 BAUD_RATE = 115200
 
 # 00 13 A2 00 42 43 5E A9
@@ -38,7 +37,7 @@ def RunCommandThread(xbee: XBee, CommandStopEvent: threading.Event):
 
             if Data:
                 #print("Data received:\n")
-                #print("Retrieved data:", data.received_data.decode("utf-8"))
+                #print("Retrieved data:", Data.received_data.decode("utf-8"))
 
                 if (Data is not None):
                     CommandQueue.put(Data)

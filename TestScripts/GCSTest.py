@@ -18,48 +18,53 @@ PacketLibrary.SetVehicleMACAddress(Vehicle.MRA, "0013A200428396C0")
 
 LaunchGCSXBee(PORT)
 
-KeepInCoordinates = [[0, 4], [4, 0], [4, 4], [0, 4]]
+def SendPresetCommands():
+    KeepInCoordinates = [[0, 4], [4, 0], [4, 4], [0, 4]]
 
-Command1 = Heartbeat(ConnectionStatus.Connected)
-Command2 = EmergencyStop(0)
-Command3 = AddZone(ZoneType.KeepIn, KeepInCoordinates)
+    Command1 = Heartbeat(ConnectionStatus.Connected)
+    Command2 = EmergencyStop(0)
+    Command3 = AddZone(ZoneType.KeepIn, KeepInCoordinates)
 
-SendCommand(Command1, Vehicle.MRA)
-SendCommand(Command2, Vehicle.MRA)
-SendCommand(Command3, Vehicle.MRA)
+    SendCommand(Command1, Vehicle.MRA)
+    SendCommand(Command2, Vehicle.MRA)
+    SendCommand(Command3, Vehicle.MRA)
 
-Telemetry1 = None
-Telemetry2 = None
-Telemetry3 = None
+    Telemetry1 = ReceiveTelemetry(True)
+    Telemetry2 = ReceiveTelemetry(True)
+    Telemetry3 = ReceiveTelemetry(True)
 
-while True:
-    if (Telemetry1 is None):
-        Telemetry1 = ReceiveTelemetry(False)
-
-        continue
-
-    if (Telemetry2 is None):
-        Telemetry2 = ReceiveTelemetry(False)
-
-        continue
-
-    if (Telemetry3 is None):
-        Telemetry3 = ReceiveTelemetry(False)
-
-        continue
-
-    if ((Telemetry1 != None) and (Telemetry2 != None) and (Telemetry3 != None)):
+    if (Telemetry1 is not None):
         print(f"MAC Address of {Telemetry1.Vehicle} is {Telemetry1.MACAddress}")
-
         print(Telemetry1)
+    
+    if (Telemetry2 is not None):
+        print(f"MAC Address of {Telemetry2.Vehicle} is {Telemetry2.MACAddress}")
         print(Telemetry2)
+    
+    if (Telemetry3 is not None):
+        print(f"MAC Address of {Telemetry3.Vehicle} is {Telemetry3.MACAddress}")
         print(Telemetry3)
 
-        break
-
-# End of the example. The rest is for live command sending
-
 def main():
+    while True:
+        print("Main Menu:\n1.) Send Preset Commands\n2.) Send Live Commands")
+
+        Input = input()
+
+        try:
+            Selection = int(Input)
+
+            match (Selection):
+                case 1:
+                    SendPresetCommands()
+                case 2:
+                    SendLiveCommand()
+                case _:
+                    continue
+        except Exception as e:
+            print("Invalid Input")
+
+def SendLiveCommand():
     while True:
         try:
             print("Enter a Command:")
@@ -70,6 +75,8 @@ def main():
 
             if (Command is not None):
                 SendCommand(Command, Vehicle.MRA)
+            else:
+                return
 
             TelemetryInstance = ReceiveTelemetry(True)
 
@@ -137,12 +144,12 @@ def AddZoneCommand():
     print("Enter 3 to 6 Coordinates:")
 
     while True:
-        print(f"Enter Coordinate {CoordinateCount} as (x, y), or q to end:")
+        print(f"Enter Coordinate {CoordinateCount + 1} as (x, y), or q to end:")
 
         Input = input()
 
         try:
-            if (CoordinateCount < 6):
+            if (CoordinateCount < 5):
                 if ((Input.upper() == "Q") and (CoordinateCount >= 3)):
                     return AddZone(Zone, Coordinates)
 
