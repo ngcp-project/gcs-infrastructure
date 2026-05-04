@@ -41,8 +41,6 @@ while (True):
                     
         except json.JSONDecodeError as e:
             print(f"JSON Error: {e}")
-
-        print(f"{Command.COMMAND_ID} {Command.PacketID} {Command.PACKET_ID}")
     
         if (isinstance(Command, str)):
             TelemetryInstance = Telemetry(CommandData["Command ID"], CommandData["Packet ID"], 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
