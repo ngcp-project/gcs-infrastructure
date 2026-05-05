@@ -4,151 +4,65 @@ from Infrastructure.InfrastructureInterface import *
 from PacketLibrary.PacketLibrary import PacketLibrary
 from Telemetry.Telemetry import Telemetry
 
-# Only relevant to the test script
-import ast
-# --------------------------------
+import json
 
-PORT = "COM4"
+PORT = "/dev/ttyUSB0"
 
 # This is an example script and should be copied and pasted into your repository where you have gcs-infrastructure as a git submodule
 
 # Read gcs-infrastructure documentation to understand the implications of the following function calls
 
-PacketLibrary.SetVehicleMACAddress(Vehicle.MRA, "0013A200428396C0")
+PacketLibrary.SetGCSMACAddress("0013A2004283A0EC")
 
-LaunchGCSXBee(PORT)
+LaunchVehicleXBee(PORT)
 
-KeepInCoordinates = [[0, 4], [4, 0], [4, 4], [0, 4]]
+Command1 = ReceiveCommand(DecodeFormat.Class)
+Command2 = ReceiveCommand(DecodeFormat.Class)
+Command3 = ReceiveCommand(DecodeFormat.Class)
 
-Command1 = Heartbeat(ConnectionStatus.Connected)
-Command2 = EmergencyStop(0)
-Command3 = AddZone(ZoneType.KeepIn, KeepInCoordinates)
+print(Command1)
+print(Command2)
+print(Command3)
 
-SendCommand(Command1, Vehicle.MRA)
-SendCommand(Command2, Vehicle.MRA)
-SendCommand(Command3, Vehicle.MRA)
+Telemetry1 = Telemetry(Command1.COMMAND_ID, Command1.PacketID, 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
+Telemetry2 = Telemetry(Command2.COMMAND_ID, Command2.PacketID, 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
+Telemetry3 = Telemetry(Command3.COMMAND_ID, Command3.PacketID, 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
 
-Telemetry1 = ReceiveTelemetry()
-Telemetry2 = ReceiveTelemetry()
-Telemetry3 = ReceiveTelemetry()
+SendTelemetry(Telemetry1)
+SendTelemetry(Telemetry2)
+SendTelemetry(Telemetry3)
 
-print(f"MAC Address of {Telemetry1.Vehicle} is {Telemetry1.MACAddress}")
+# End of the example. The rest is for live command receiving
 
-print(Telemetry1)
-print(Telemetry2)
-print(Telemetry3)
+while (True):
+    Command = ReceiveCommand(DecodeFormat.Class)
 
-# End of the example. The rest is for live command sending
+    print(type(Command))
 
-def main():
-    while True:
-        try:
-            Data = input()
-
-            Command = ProcessCommand(Data)
-
-            if (Command is not None):
-                SendCommand(Command, Vehicle.MRA)
-
-            TelemetryInstance = ReceiveTelemetry()
-
-            if (TelemetryInstance is not None):
-                print(TelemetryInstance)
+    try:
+        if (isinstance(Command, str)):
+            CommandData = json.loads(Command)
         
-        except Exception as e:
-            print(f"Error: {e}")
+        match (Command):
+            case Heartbeat():
+                print("Executing Heartbeat code")
+            case EmergencyStop():
+                print("Executing Emergency Stop code")
+            case AddZone():
+                print("Executing Keep In code")
+            case PatientLocation():
+                print("Executing Patient Location code")
+            case _:
+                print("Unknown Command Type")
+                    
+    except json.JSONDecodeError as e:
+        print(f"JSON Error: {e}")
 
-def ProcessCommand(Command: str):
-    if ((Command.replace(" ", "").upper() == "HEARTBEAT") or (Command.replace(" ", "") == "1")):
-        return HeartbeatCommand()
-    elif ((Command.replace(" ", "").upper() == "EMERGENCYSTOP") or (Command.replace(" ", "") == "2")):
-        return EmergencyStopCommand()
-    elif ((Command.replace(" ", "").upper() == "ADDZONE") or (Command.replace(" ", "") == "3")):
-        return AddZoneCommand()
-    elif ((Command.replace(" ", "").upper() == "PATIENTLOCATION") or (Command.replace(" ", "") == "4")):
-        return PatientLocationCommand()
+    print(f"{Command.COMMAND_ID} {Command.PacketID} {Command.PACKET_ID}")
     
-    return None
+    if (isinstance(Command, str)):
+        TelemetryInstance = Telemetry(CommandData["Command ID"], CommandData["Packet ID"], 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
+    else:
+        TelemetryInstance = Telemetry(Command.COMMAND_ID, Command.PacketID, 100, 0, 0, 0, 45, 0.5, 0, (1, 2), 0, 0, 1.0, 1.0, 0)
 
-def EmergencyStopCommand():
-    print("Emergency Stop Command\nEnter Stop Status:")
-
-    while True:
-        Input = input()
-
-        try:
-            StopStatus = int(Input)
-
-            return EmergencyStop(StopStatus)
-        except ValueError:
-            print("Integer Required")
-
-def HeartbeatCommand():
-    print("Heartbeat Command\nEnter Connection Status:")
-
-    while True:
-        Input = input()
-
-        if ((Input.upper() == "CONNECTED") or (Input == "0")):
-            return Heartbeat(ConnectionStatus.Connected)
-        elif ((Input.upper() == "UNSTABLE") or (Input == "1")):
-            return Heartbeat(ConnectionStatus.Unstable)
-        elif ((Input.upper() == "DISCONNECTED") or (Input == "2")):
-            return Heartbeat(ConnectionStatus.Disconnected)
-
-def AddZoneCommand():
-    print("Add Zone Command\nEnter Zone Type:")
-
-    Coordinates = []
-    CoordinateCount = 0
-    Zone = None
-
-    while (Zone == None):
-        Input = input()
-
-        if ((Input.upper() == "KEEPIN") or (Input == "0")):
-            Zone = ZoneType.KeepIn
-        elif ((Input.upper() == "KEEPOUT") or (Input == "1")):
-            Zone = ZoneType.KeepOut
-        elif ((Input.upper() == "SEARCHAREA") or (Input == "2")):
-            Zone = ZoneType.SearchArea
-    
-    print("Enter 3 to 6 Coordinates:")
-
-    while True:
-        print(f"Enter Coordinate {CoordinateCount} as (x, y), or q to end:")
-
-        Input = input()
-
-        try:
-            if (CoordinateCount < 6):
-                if ((Input.upper() == "Q") and (CoordinateCount >= 3)):
-                    return AddZone(Zone, Coordinates)
-
-                Coordinate = ast.literal_eval(Input)
-
-                print(Coordinate)
-
-                Coordinates.append(Coordinate)
-
-                CoordinateCount += 1
-            else:
-                return AddZone(Zone, Coordinates)
-        except Exception:
-            print("Invalid tuple")
-
-def PatientLocationCommand():
-    print("Patient Location Command\nEnter Coordinate as (x, y):")
-
-    while True:
-        Input = input()
-
-        try:
-            Coordinate = ast.literal_eval(Input)
-
-            return PatientLocation(Coordinate)
-        except Exception:
-            print("Invalid tuple")
-
-if __name__ == '__main__':
-    main()
+    SendTelemetry(TelemetryInstance)

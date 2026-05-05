@@ -21,8 +21,6 @@ def SendCommand(CommandInstance: CommandInterface, VehicleName: Vehicle):
 def SendTelemetry(TelemetryInstance: Telemetry):
     TelemetryQueue.put(TelemetryInstance)
 
-    print("Telemetry Queued")
-
 def ReceiveCommand(DecodeResult: DecodeFormat) -> CommandInterface:
     Data = CommandQueue.get()
 
@@ -45,8 +43,6 @@ def ReceiveCommand(DecodeResult: DecodeFormat) -> CommandInterface:
             print("\nRetrieved data:", Data.received_data.decode("utf-8"))
 
     CommandQueue.task_done()
-
-    print("Command Received")
 
     return CommandInstance
 

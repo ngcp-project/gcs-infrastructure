@@ -8,6 +8,7 @@ import queue
 import threading
 
 from xbee import XBee
+from logger import Logger
 
 #PORT = "COM4"
 BAUD_RATE = 115200
@@ -15,7 +16,7 @@ BAUD_RATE = 115200
 # 00 13 A2 00 42 43 5E A9
 def StartVehicleXBee(PORT: str):
     # Initialize XBee object
-    xbee = XBee(PORT, BAUD_RATE)
+    xbee = XBee(PORT, BAUD_RATE, logger=Logger(log_to_console=False))
 
         # Open serial connection
     try:
