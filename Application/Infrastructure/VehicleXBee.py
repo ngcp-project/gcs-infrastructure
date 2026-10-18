@@ -4,6 +4,7 @@ from Infrastructure.PacketQueue import *
 from PacketLibrary.PacketLibrary import PacketLibrary
 from Telemetry.Telemetry import Telemetry
 
+import queue
 import threading
 
 from xbee import XBee
@@ -51,7 +52,7 @@ def RunCommandThread(xbee: XBee, CommandStopEvent: threading.Event):
 def RunTelemetryThread(xbee: XBee, TelemetryStopEvent: threading.Event):
     while xbee is not None and xbee.ser is not None and not TelemetryStopEvent.is_set():
         try:
-            TelemetryInstance = TelemetryQueue.get()
+            TelemetryInstance = TelemetryQueue.get(timeout = 1.0)
 
             if (isinstance(TelemetryInstance, Telemetry)):
                 EncodedTelemetry = TelemetryInstance.Encode()

@@ -49,14 +49,14 @@ To run ```gcs-infrastructure``` as a standalone repository:
 To start the GCS XBee:
 
 ```python
-from InfrastructureInterface import LaunchGCSXBee
+from Infrastructure import LaunchGCSXBee
 
 LaunchGCSXBee(PORT)
 ```
 
 To start a vehicle XBee:
 ```python
-from InfrastructureInterface import LaunchVehicleXBee
+from Infrastructure import LaunchVehicleXBee
 
 LaunchVehicleXBee(PORT)
 ```
@@ -67,7 +67,7 @@ LaunchVehicleXBee(PORT)
 To send a Command:
 
 ```python
-from InfrastructureInterface import SendCommand
+from Infrastructure import SendCommand
 
 # Assuming LaunchGCSXBee was called earlier, CommandInstance is any Command object
 
@@ -77,7 +77,7 @@ SendCommand(CommandInstance, Vehicle.ALL)
 To send Telemetry:
 
 ```python
-from InfrastructureInterface import SendTelemetry
+from Infrastructure import SendTelemetry
 
 # Assuming LaunchVehicleXbee was called earlier, TelemetryInstance is a Telemetry object
 
@@ -87,7 +87,7 @@ SendTelemetry(TelemetryInstance)
 To receive a Command:
 
 ```python
-from InfrastructureInterface import ReceiveCommand
+from Infrastructure import ReceiveCommand
 
 # Assuming LaunchVehicleXBee was called earlier, ReceivedCommand will be assigned to a Command object. Blocking is a boolean that defines whether the queue should block the thread for up to 5 seconds or not. DecodeType is the DecodeFormat the command should be retuned as
 
@@ -97,7 +97,7 @@ ReceivedCommand = ReceiveCommand(Blocking, DecodeType)
 To receive Telemetry:
 
 ```python
-from InfrastructureInterface import ReceiveTelemetry
+from Infrastructure import ReceiveTelemetry
 
 #Assuming LaunchGCSXBee was called earlier, ReceivedTelemetry will be a Telemetry object. Blocking is a boolean that defines whether the queue should block the thread for up to 5 seconds or not.
 
@@ -105,7 +105,7 @@ ReceivedTelemetry = ReceiveTelemetry(Blocking)
 ```
 
 >[!NOTE]
-> ```SendCommand``` and ```ReceiveTelemetry``` will now only block the thread if ```Blocking``` is True. If it is a blocking call the thread will block up to 5 seconds before returning ```None```
+> ```ReceiveCommand``` and ```ReceiveTelemetry``` will now only block the thread if ```Blocking``` is True. If it is a blocking call the thread will block up to 5 seconds before returning ```None```
 
 
 
@@ -125,12 +125,10 @@ Commands can be sent either by name or using their Command ID as an alias. Comma
 | --- | --- | --- |
 | Heartbeat | 1 | ConnectionStatus |
 | Emergency Stop | 2 | int |
-| Keep In | 3 | list<tuple(x, y)>() |
-| Keep Out | 4 | list<tuple(x, y)>() |
-| Current Patient Location | 5 | tuple(x, y) |
-| Search Area | 6 | list<tuple(x, y)>() |
+| Add Zone | 3 | ZoneType, list<tuple(x, y)>() (3 to 6 coordinates) |
+| Patient Location | 4 | tuple(x, y) |
 
-Any other string will be sent as a string literal
+Any other input returns to the main menu
 
 ### VehicleTest.py
 
@@ -140,9 +138,9 @@ Serves as a demo vehicle able to receive commands, generate telemetry, and send 
 <!-- Libraries? Maybe there will be another one made for future iterations of this project :O -->
 
 ### XBee Serial Library
-This library builds off [pySerial](https://pyserial.readthedocs.io/en/latest/pyserial.html) and allows for the easy transmission and reception of data over the XBee module. This library was made specifically for the [Digi XBee® RR Pro Module][xbee_rr_datasheet].
+This library builds off [pySerial](https://pyserial.readthedocs.io/en/latest/pyserial.html) and allows for the easy transmission and reception of data over the XBee module. This library was made specifically for the Digi XBee® RR Pro Module.
 
-Refer to the [XBee Serial Library][xbee_readme.md] page for further details and documentation.
+Refer to the [XBee Serial Library](https://github.com/ngcp-project/xbee-python) page for further details and documentation.
 
 ## FPV
 <!-- TO DO -->

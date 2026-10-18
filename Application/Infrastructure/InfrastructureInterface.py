@@ -5,6 +5,8 @@ from Infrastructure.VehicleXBee import StartVehicleXBee
 from Infrastructure.PacketQueue import *
 from Telemetry.Telemetry import Telemetry
 
+import queue
+
 def LaunchGCSXBee(PORT: str):
     StartGCSXBee(PORT)
 

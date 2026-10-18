@@ -19,7 +19,7 @@ PacketLibrary.SetVehicleMACAddress(Vehicle.MRA, "0013A200428396C0")
 LaunchGCSXBee(PORT)
 
 def SendPresetCommands():
-    KeepInCoordinates = [[0, 4], [4, 0], [4, 4], [0, 4]]
+    KeepInCoordinates = [[0, 0], [4, 0], [4, 4], [0, 4]]
 
     Command1 = Heartbeat(ConnectionStatus.Connected)
     Command2 = EmergencyStop(0)
@@ -149,18 +149,18 @@ def AddZoneCommand():
         Input = input()
 
         try:
-            if (CoordinateCount < 5):
-                if ((Input.upper() == "Q") and (CoordinateCount >= 3)):
-                    return AddZone(Zone, Coordinates)
+            if ((Input.upper() == "Q") and (CoordinateCount >= 3)):
+                return AddZone(Zone, Coordinates)
 
-                Coordinate = ast.literal_eval(Input)
+            Coordinate = ast.literal_eval(Input)
 
-                print(Coordinate)
+            print(Coordinate)
 
-                Coordinates.append(Coordinate)
+            Coordinates.append(Coordinate)
 
-                CoordinateCount += 1
-            else:
+            CoordinateCount += 1
+
+            if (CoordinateCount >= 6):
                 return AddZone(Zone, Coordinates)
         except Exception:
             print("Invalid tuple")

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "gcs-infrastructure"
 version = "0.2.5"
 description = "GCS Infrastructure Interface and Tests"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 authors = [
     { name = "Aidan Sanders" },

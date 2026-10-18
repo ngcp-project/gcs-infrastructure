@@ -35,7 +35,7 @@ def StartGCSXBee(PORT: str):
 def RunCommandThread(xbee: XBee, CommandStopEvent: threading.Event):
     while xbee is not None and xbee.ser is not None and not CommandStopEvent.is_set():
         try:
-            CommandInstance = CommandQueue.get()
+            CommandInstance = CommandQueue.get(timeout = 1.0)
 
             if (isinstance(CommandInstance, CommandInterface)):
                 EncodedCommand = CommandInstance.EncodePacket()
